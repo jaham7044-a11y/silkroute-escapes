@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ROUTES } from "@/data/routes";
+import type { TourRoute } from "@/data/routes";
 import { SectionLabel } from "@/components/SectionLabel";
 import { ArrowRight, Calendar, Check, Map as MapIcon, MapPin, Plane } from "lucide-react";
 
@@ -38,7 +39,7 @@ export const Route = createFileRoute("/routes/$id")({
 });
 
 function RouteDetailPage() {
-  const r = Route.useLoaderData();
+  const r = Route.useLoaderData() as TourRoute;
 
   return (
     <div>
