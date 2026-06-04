@@ -5,7 +5,7 @@ import { RouteCard } from "@/components/RouteCard";
 import { SectionLabel } from "@/components/SectionLabel";
 import heroImg from "@/assets/route-shanghai.jpg";
 
-export const Route = createFileRoute("/routes")({
+export const Route = createFileRoute("/routes/")({
   head: () => ({
     meta: [
       { title: "All Routes — Silk Route Escapes" },
