@@ -69,6 +69,17 @@ function RouteDetailPage() {
         </div>
       </section>
 
+      {/* OVERVIEW STATS */}
+      <section className="mx-auto max-w-7xl px-6 pt-20">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 glass-strong rounded-3xl p-6">
+          <Stat icon={<Plane className="h-5 w-5 text-gold" />} label="Departure" value={r.from} />
+          <Stat icon={<MapPin className="h-5 w-5 text-gold" />} label="Destination" value={r.to} />
+          <Stat icon={<Calendar className="h-5 w-5 text-gold" />} label="Duration" value={r.duration} />
+          <Stat icon={<Users className="h-5 w-5 text-gold" />} label="Travel Type" value={`${r.activity} · Private`} />
+          <Stat icon={<DollarSign className="h-5 w-5 text-gold" />} label="Starting From" value={`$${r.price.toLocaleString()}`} />
+        </div>
+      </section>
+
       {/* OVERVIEW + INCLUDED */}
       <section className="mx-auto max-w-7xl px-6 py-24 grid gap-12 lg:grid-cols-3">
         <div className="lg:col-span-2">
@@ -129,32 +140,45 @@ function RouteDetailPage() {
         </div>
       </section>
 
-      {/* MAP / CTA */}
-      <section className="mx-auto max-w-7xl px-6 pb-24">
+      {/* GALLERY */}
+      <section className="mx-auto max-w-7xl px-6 py-12">
+        <SectionLabel>Activity Gallery</SectionLabel>
+        <h2 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">Moments from the journey</h2>
+        <Gallery cover={r.image} />
+      </section>
+
+      {/* MAP */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
         <div className="glass-strong rounded-3xl p-10 md:p-16 grid gap-10 md:grid-cols-2 items-center">
           <div>
             <SectionLabel>Your Route</SectionLabel>
             <h2 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">
               {r.from} <span className="text-gold">→</span> {r.to}
             </h2>
-            <p className="mt-4 text-ivory/70">A direct, premium pathway designed by our team — fly-in, transfer, and we handle the rest.</p>
-          </div>
-          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-gold/20 grid place-items-center bg-navy-deep">
-            <MapIcon className="h-16 w-16 text-gold/40" />
-            <div className="absolute bottom-4 left-4 right-4 glass rounded-xl px-4 py-3 text-ivory text-sm flex justify-between">
-              <span>{r.from}, USA</span>
-              <span className="text-gold">✈</span>
-              <span>{r.to}, China</span>
+            <p className="mt-4 text-ivory/70">A direct, premium pathway designed by our team — fly-in, transfer, and we handle the rest. Trans-Pacific flight with onward private transfer in China.</p>
+            <div className="mt-8 grid grid-cols-3 gap-4 text-center">
+              <div className="glass rounded-xl py-3"><div className="font-display text-2xl text-gold">~13h</div><div className="text-[10px] uppercase tracking-widest text-ivory/55 mt-1">Flight</div></div>
+              <div className="glass rounded-xl py-3"><div className="font-display text-2xl text-gold">{r.days}</div><div className="text-[10px] uppercase tracking-widest text-ivory/55 mt-1">Days</div></div>
+              <div className="glass rounded-xl py-3"><div className="font-display text-2xl text-gold">5★</div><div className="text-[10px] uppercase tracking-widest text-ivory/55 mt-1">Hotels</div></div>
             </div>
           </div>
+          <RouteMap from={r.from} to={r.to} />
         </div>
+      </section>
 
-        <div className="mt-16 text-center">
-          <h3 className="font-display text-4xl text-ivory">Interested in this route?</h3>
-          <p className="mt-3 text-ivory/65">Tell us your dates and we'll craft a tailored quote within 24 hours.</p>
-          <Link to="/contact" className="mt-8 inline-flex items-center gap-3 rounded-full gold-gradient px-8 py-4 text-sm font-medium text-navy-deep shadow-luxe">
-            Request Quote <ArrowRight className="h-4 w-4" />
-          </Link>
+      {/* CTA */}
+      <section className="mx-auto max-w-7xl px-6 pb-24">
+
+        <div className="glass-strong rounded-3xl p-12 md:p-20 text-center relative overflow-hidden">
+          <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(circle at 50% 0%, var(--gold), transparent 60%)" }} />
+          <div className="relative">
+            <SectionLabel>Ready to Travel</SectionLabel>
+            <h3 className="mt-4 font-display text-4xl md:text-5xl text-ivory">Interested in this route?</h3>
+            <p className="mt-4 text-ivory/65 max-w-xl mx-auto">Tell us your dates and we'll craft a tailored quote within 24 hours. No obligation, just expert advice from our China specialists.</p>
+            <Link to="/contact" className="mt-10 inline-flex items-center gap-3 rounded-full gold-gradient px-10 py-4 text-sm font-medium text-navy-deep shadow-luxe hover:scale-105 transition">
+              Request Quote <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </section>
     </div>
@@ -165,6 +189,86 @@ function Pill({ icon, children }: { icon: React.ReactNode; children: React.React
   return (
     <div className="glass rounded-full px-5 py-2 flex items-center gap-2 text-sm">
       {icon} {children}
+    </div>
+  );
+}
+
+function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-3 px-2">
+      <div className="grid h-10 w-10 place-items-center rounded-full border border-gold/30 shrink-0">{icon}</div>
+      <div className="min-w-0">
+        <div className="text-[10px] uppercase tracking-widest text-ivory/50">{label}</div>
+        <div className="font-display text-lg text-ivory truncate">{value}</div>
+      </div>
+    </div>
+  );
+}
+
+function Gallery({ cover }: { cover: string }) {
+  const images = [cover, galleryLantern, galleryTea, heroGreatwall, galleryTrain, routeShanghai, routeBeijing];
+  const [active, setActive] = useState<string | null>(null);
+  return (
+    <>
+      <div className="mt-10 grid gap-4 grid-cols-2 md:grid-cols-4 auto-rows-[180px]">
+        {images.map((src, i) => (
+          <button
+            key={i}
+            onClick={() => setActive(src)}
+            className={`group relative overflow-hidden rounded-2xl border border-gold/15 ${i === 0 ? "col-span-2 row-span-2" : ""} ${i === 3 ? "md:row-span-2" : ""}`}
+          >
+            <img src={src} alt="Journey moment" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110" />
+            <div className="absolute inset-0 bg-navy-deep/20 group-hover:bg-navy-deep/0 transition" />
+          </button>
+        ))}
+      </div>
+      {active && (
+        <div onClick={() => setActive(null)} className="fixed inset-0 z-50 bg-navy-deep/95 backdrop-blur-lg grid place-items-center p-6 cursor-zoom-out animate-fade-in">
+          <img src={active} alt="Expanded" className="max-h-[90vh] max-w-[90vw] rounded-2xl shadow-luxe" />
+        </div>
+      )}
+    </>
+  );
+}
+
+function RouteMap({ from, to }: { from: string; to: string }) {
+  return (
+    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-gold/20 bg-[oklch(0.12_0.03_260)]">
+      <svg viewBox="0 0 400 300" className="absolute inset-0 h-full w-full">
+        <defs>
+          <linearGradient id="arc" x1="0" x2="1">
+            <stop offset="0%" stopColor="oklch(0.78 0.13 75)" stopOpacity="0.2" />
+            <stop offset="50%" stopColor="oklch(0.78 0.13 75)" stopOpacity="1" />
+            <stop offset="100%" stopColor="oklch(0.78 0.13 75)" stopOpacity="0.2" />
+          </linearGradient>
+        </defs>
+        {[...Array(8)].map((_, i) => (
+          <line key={`h${i}`} x1="0" y1={i * 40} x2="400" y2={i * 40} stroke="oklch(0.78 0.13 75)" strokeOpacity="0.06" />
+        ))}
+        {[...Array(11)].map((_, i) => (
+          <line key={`v${i}`} x1={i * 40} y1="0" x2={i * 40} y2="300" stroke="oklch(0.78 0.13 75)" strokeOpacity="0.06" />
+        ))}
+        {/* USA blob */}
+        <ellipse cx="80" cy="160" rx="70" ry="50" fill="oklch(0.78 0.13 75)" fillOpacity="0.08" />
+        {/* China blob */}
+        <ellipse cx="320" cy="140" rx="65" ry="55" fill="oklch(0.78 0.13 75)" fillOpacity="0.08" />
+        {/* Arc */}
+        <path d="M 80 160 Q 200 20 320 140" stroke="url(#arc)" strokeWidth="2.5" fill="none" strokeDasharray="6 6">
+          <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1.5s" repeatCount="indefinite" />
+        </path>
+        {/* Plane */}
+        <circle cx="200" cy="60" r="5" fill="oklch(0.78 0.13 75)">
+          <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite" />
+        </circle>
+        {/* Points */}
+        <circle cx="80" cy="160" r="7" fill="oklch(0.78 0.13 75)" />
+        <circle cx="80" cy="160" r="14" fill="oklch(0.78 0.13 75)" fillOpacity="0.2" />
+        <circle cx="320" cy="140" r="7" fill="oklch(0.78 0.13 75)" />
+        <circle cx="320" cy="140" r="14" fill="oklch(0.78 0.13 75)" fillOpacity="0.2" />
+      </svg>
+      <div className="absolute top-4 left-4 glass rounded-lg px-3 py-1.5 text-xs text-ivory">{from} <span className="text-ivory/40">USA</span></div>
+      <div className="absolute top-4 right-4 glass rounded-lg px-3 py-1.5 text-xs text-ivory">{to} <span className="text-ivory/40">CHN</span></div>
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 glass rounded-full px-4 py-1.5 text-[10px] uppercase tracking-widest text-gold">Trans-Pacific Route</div>
     </div>
   );
 }
