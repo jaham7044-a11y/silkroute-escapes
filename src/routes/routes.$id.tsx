@@ -2,7 +2,14 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ROUTES } from "@/data/routes";
 import type { TourRoute } from "@/data/routes";
 import { SectionLabel } from "@/components/SectionLabel";
-import { ArrowRight, Calendar, Check, Map as MapIcon, MapPin, Plane } from "lucide-react";
+import { ArrowRight, Calendar, Check, MapPin, Plane, DollarSign, Users } from "lucide-react";
+import galleryLantern from "@/assets/gallery-lantern.jpg";
+import galleryTea from "@/assets/gallery-tea.jpg";
+import galleryTrain from "@/assets/gallery-train.jpg";
+import heroGreatwall from "@/assets/hero-greatwall.jpg";
+import routeShanghai from "@/assets/route-shanghai.jpg";
+import routeBeijing from "@/assets/route-beijing.jpg";
+import { useState } from "react";
 
 export const Route = createFileRoute("/routes/$id")({
   head: ({ params }) => {
