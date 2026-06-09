@@ -83,10 +83,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Silk Route Escapes — Luxury China Travel from the USA" },
       { name: "description", content: "Concierge-led luxury travel packages and guided tours from the United States to China's most breathtaking destinations." },
       { name: "author", content: "Silk Route Escapes" },
-      { property: "og:title", content: "Silk Route Escapes — Luxury China Travel" },
-      { property: "og:description", content: "Concierge-led luxury journeys from the USA to China." },
+      { property: "og:title", content: "Silk Route Escapes — Luxury China Travel from the USA" },
+      { property: "og:description", content: "Concierge-led luxury travel packages and guided tours from the United States to China's most breathtaking destinations." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Silk Route Escapes — Luxury China Travel from the USA" },
+      { name: "twitter:description", content: "Concierge-led luxury travel packages and guided tours from the United States to China's most breathtaking destinations." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a18b705c-d027-4afd-9a19-1d8e6aceb553/id-preview-71837254--a55692b2-ea85-490f-963a-a4c1f2cd0c4d.lovable.app-1780585961820.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a18b705c-d027-4afd-9a19-1d8e6aceb553/id-preview-71837254--a55692b2-ea85-490f-963a-a4c1f2cd0c4d.lovable.app-1780585961820.png" },
     ],
     links: [
       {
