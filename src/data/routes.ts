@@ -19,7 +19,14 @@ export type TourRoute = {
   highlights: string[];
   included: string[];
   itinerary: { day: number; title: string; detail: string }[];
+  videos?: { title: string; youtubeUrl: string; description?: string; duration?: string }[];
 };
+
+export const DEFAULT_VIDEOS = [
+  { title: "Shanghai City Highlights", description: "A cinematic tour of the Bund, Pudong and beyond.", duration: "8:42", youtubeUrl: "https://youtu.be/LhAf2Xe8US8?si=kdckmXyr0m0x4wuO" },
+  { title: "Exploring Beijing", description: "Imperial palaces, hutongs, and the Great Wall.", duration: "12:15", youtubeUrl: "https://youtu.be/ll_8Hsxa7Qg?si=XC_6_sQvn4ssjagQ" },
+  { title: "Hidden Gems of China", description: "Off-the-beaten-path discoveries across the country.", duration: "10:03", youtubeUrl: "https://youtu.be/17e_19if6Io?si=9dzF60DtglyH3yzS" },
+];
 
 export const ROUTES: TourRoute[] = [
   {
