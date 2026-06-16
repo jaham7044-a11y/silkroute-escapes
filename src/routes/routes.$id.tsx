@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ROUTES } from "@/data/routes";
 import type { TourRoute } from "@/data/routes";
+import { DEFAULT_VIDEOS } from "@/data/routes";
+import { VideoSection, VideoCarousel } from "@/components/VideoSection";
 import { SectionLabel } from "@/components/SectionLabel";
 import { ArrowRight, Calendar, Check, MapPin, Plane, DollarSign, Users } from "lucide-react";
 import galleryLantern from "@/assets/gallery-lantern.jpg";
@@ -165,6 +167,12 @@ function RouteDetailPage() {
           <RouteMap from={r.from} to={r.to} />
         </div>
       </section>
+
+      {/* TRAVEL VIDEOS */}
+      <VideoSection videos={r.videos ?? DEFAULT_VIDEOS} />
+
+      {/* JOURNEY THROUGH VIDEO — CAROUSEL */}
+      <VideoCarousel videos={r.videos ?? DEFAULT_VIDEOS} />
 
       {/* CTA */}
       <section className="mx-auto max-w-7xl px-6 pb-24">
