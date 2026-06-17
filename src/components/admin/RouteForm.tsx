@@ -294,9 +294,8 @@ function Section({ title, subtitle, children }: { title: string; subtitle?: stri
 }
 
 function Grid({ cols, children }: { cols: 2 | 3; children: React.ReactNode }) {
-  return (
-    <div className={`grid gap-4 sm:grid-cols-${cols === 3 ? "3" : "2"}`}>{children}</div>
-  );
+  const cls = cols === 3 ? "grid gap-4 sm:grid-cols-3" : "grid gap-4 sm:grid-cols-2";
+  return <div className={cls}>{children}</div>;
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
