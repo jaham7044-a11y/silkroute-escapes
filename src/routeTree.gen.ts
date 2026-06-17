@@ -19,9 +19,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as RoutesIndexRouteImport } from './routes/routes.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as RoutesIdRouteImport } from './routes/routes.$id'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminRoutesIndexRouteImport } from './routes/admin.routes.index'
+import { Route as AdminRoutesNewRouteImport } from './routes/admin.routes.new'
+import { Route as AdminRoutesEditIdRouteImport } from './routes/admin.routes.edit.$id'
 
 const GalleryRoute = GalleryRouteImport.update({
   id: '/gallery',
@@ -73,6 +76,11 @@ const RoutesIdRoute = RoutesIdRouteImport.update({
   path: '/routes/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -88,6 +96,16 @@ const AdminRoutesIndexRoute = AdminRoutesIndexRouteImport.update({
   path: '/routes/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRoutesNewRoute = AdminRoutesNewRouteImport.update({
+  id: '/routes/new',
+  path: '/routes/new',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRoutesEditIdRoute = AdminRoutesEditIdRouteImport.update({
+  id: '/routes/edit/$id',
+  path: '/routes/edit/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -99,10 +117,13 @@ export interface FileRoutesByFullPath {
   '/gallery': typeof GalleryRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/routes/$id': typeof RoutesIdRoute
   '/admin/': typeof AdminIndexRoute
   '/routes/': typeof RoutesIndexRoute
+  '/admin/routes/new': typeof AdminRoutesNewRoute
   '/admin/routes/': typeof AdminRoutesIndexRoute
+  '/admin/routes/edit/$id': typeof AdminRoutesEditIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -113,10 +134,13 @@ export interface FileRoutesByTo {
   '/gallery': typeof GalleryRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/routes/$id': typeof RoutesIdRoute
   '/admin': typeof AdminIndexRoute
   '/routes': typeof RoutesIndexRoute
+  '/admin/routes/new': typeof AdminRoutesNewRoute
   '/admin/routes': typeof AdminRoutesIndexRoute
+  '/admin/routes/edit/$id': typeof AdminRoutesEditIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -129,10 +153,13 @@ export interface FileRoutesById {
   '/gallery': typeof GalleryRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/routes/$id': typeof RoutesIdRoute
   '/admin/': typeof AdminIndexRoute
   '/routes/': typeof RoutesIndexRoute
+  '/admin/routes/new': typeof AdminRoutesNewRoute
   '/admin/routes/': typeof AdminRoutesIndexRoute
+  '/admin/routes/edit/$id': typeof AdminRoutesEditIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -146,10 +173,13 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/admin/settings'
     | '/routes/$id'
     | '/admin/'
     | '/routes/'
+    | '/admin/routes/new'
     | '/admin/routes/'
+    | '/admin/routes/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -160,10 +190,13 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/admin/settings'
     | '/routes/$id'
     | '/admin'
     | '/routes'
+    | '/admin/routes/new'
     | '/admin/routes'
+    | '/admin/routes/edit/$id'
   id:
     | '__root__'
     | '/'
@@ -175,10 +208,13 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/admin/settings'
     | '/routes/$id'
     | '/admin/'
     | '/routes/'
+    | '/admin/routes/new'
     | '/admin/routes/'
+    | '/admin/routes/edit/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -265,6 +301,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RoutesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/login'
@@ -286,21 +329,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRoutesIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/routes/new': {
+      id: '/admin/routes/new'
+      path: '/routes/new'
+      fullPath: '/admin/routes/new'
+      preLoaderRoute: typeof AdminRoutesNewRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/routes/edit/$id': {
+      id: '/admin/routes/edit/$id'
+      path: '/routes/edit/$id'
+      fullPath: '/admin/routes/edit/$id'
+      preLoaderRoute: typeof AdminRoutesEditIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminRoutesNewRoute: typeof AdminRoutesNewRoute
   AdminRoutesIndexRoute: typeof AdminRoutesIndexRoute
+  AdminRoutesEditIdRoute: typeof AdminRoutesEditIdRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminDashboardRoute: AdminDashboardRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminRoutesNewRoute: AdminRoutesNewRoute,
   AdminRoutesIndexRoute: AdminRoutesIndexRoute,
+  AdminRoutesEditIdRoute: AdminRoutesEditIdRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
