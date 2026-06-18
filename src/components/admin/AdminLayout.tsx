@@ -11,7 +11,7 @@ import {
   X,
   Compass,
 } from "lucide-react";
-import { adminLogout } from "@/lib/admin/storage";
+import { useAdminAuth } from "@/lib/admin/auth";
 
 const NAV = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -22,11 +22,12 @@ const NAV = [
 
 export function AdminLayout({ title, children }: { title: string; children: ReactNode }) {
   const navigate = useNavigate();
+  const { user, logout } = useAdminAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
 
-  const handleLogout = () => {
-    adminLogout();
+  const handleLogout = async () => {
+    await logout();
     navigate({ to: "/admin/login", replace: true });
   };
 
@@ -66,7 +67,7 @@ export function AdminLayout({ title, children }: { title: string; children: Reac
             <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
           </div>
           <div className="flex items-center gap-3 text-sm text-slate-500">
-            <span className="hidden sm:inline">admin@travel.com</span>
+            <span className="hidden sm:inline">{user?.email ?? ""}</span>
             <div className="h-8 w-8 rounded-full bg-gradient-to-br from-amber-400 to-rose-500" />
           </div>
         </header>

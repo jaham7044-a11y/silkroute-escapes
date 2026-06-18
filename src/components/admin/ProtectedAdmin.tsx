@@ -1,23 +1,22 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { isAdminLoggedIn } from "@/lib/admin/storage";
+import { Loader2 } from "lucide-react";
+import { useAdminAuth } from "@/lib/admin/auth";
 
 export function ProtectedAdmin({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const [checked, setChecked] = useState(false);
+  const { user, loading } = useAdminAuth();
 
   useEffect(() => {
-    if (!isAdminLoggedIn()) {
+    if (!loading && !user) {
       navigate({ to: "/admin/login", replace: true });
-      return;
     }
-    setChecked(true);
-  }, [navigate]);
+  }, [loading, user, navigate]);
 
-  if (!checked) {
+  if (loading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm text-slate-500">
-        Checking session…
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Checking session…
       </div>
     );
   }

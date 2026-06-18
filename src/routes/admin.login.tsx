@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
-import { Compass, Lock } from "lucide-react";
-import { ADMIN_EMAIL, ADMIN_PASSWORD, adminLogin, isAdminLoggedIn } from "@/lib/admin/storage";
+import { Compass, Loader2, Lock } from "lucide-react";
+import { useAdminAuth } from "@/lib/admin/auth";
+import { FirebaseError } from "firebase/app";
 
 export const Route = createFileRoute("/admin/login")({
   head: () => ({ meta: [{ title: "Admin Login — Silk Route Escapes" }] }),
@@ -11,28 +12,37 @@ export const Route = createFileRoute("/admin/login")({
 
 function AdminLoginPage() {
   const navigate = useNavigate();
+  const { user, loading, login } = useAdminAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (isAdminLoggedIn()) navigate({ to: "/admin/dashboard", replace: true });
-  }, [navigate]);
+    if (!loading && user) navigate({ to: "/admin/dashboard", replace: true });
+  }, [loading, user, navigate]);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
-    const ok = adminLogin(email, password);
-    if (!ok) {
-      setError("Invalid email or password.");
-      toast.error("Invalid email or password");
+    try {
+      await login(email, password);
+      toast.success("Welcome back");
+      navigate({ to: "/admin/dashboard", replace: true });
+    } catch (err) {
+      const msg =
+        err instanceof FirebaseError
+          ? err.code === "auth/invalid-credential" || err.code === "auth/wrong-password" || err.code === "auth/user-not-found"
+            ? "Invalid email or password."
+            : err.code === "auth/too-many-requests"
+              ? "Too many attempts. Try again later."
+              : err.message
+          : "Could not sign in.";
+      setError(msg);
+      toast.error(msg);
       setSubmitting(false);
-      return;
     }
-    toast.success("Welcome back");
-    navigate({ to: "/admin/dashboard", replace: true });
   };
 
   return (
@@ -58,7 +68,7 @@ function AdminLoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={ADMIN_EMAIL}
+                placeholder="you@yourdomain.com"
                 className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
                 required
               />
@@ -84,12 +94,13 @@ function AdminLoginPage() {
               disabled={submitting}
               className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-60"
             >
-              <Lock className="h-4 w-4" /> Sign in
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
+              {submitting ? "Signing in…" : "Sign in"}
             </button>
           </div>
 
           <div className="mt-5 rounded-lg bg-slate-50 px-3 py-2.5 text-xs text-slate-500">
-            <span className="font-medium text-slate-700">Demo credentials:</span> {ADMIN_EMAIL} / {ADMIN_PASSWORD}
+            Sign in with your Firebase admin account. Create users in the Firebase Console → Authentication.
           </div>
         </form>
       </div>

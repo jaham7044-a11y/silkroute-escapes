@@ -1,5 +1,10 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { AdminAuthProvider } from "@/lib/admin/auth";
 
 export const Route = createFileRoute("/admin")({
-  component: () => <Outlet />,
+  component: () => (
+    <AdminAuthProvider>
+      <Outlet />
+    </AdminAuthProvider>
+  ),
 });
