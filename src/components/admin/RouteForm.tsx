@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Plus, Trash2, Save, ArrowLeft } from "lucide-react";
+import { Loader2, Plus, Trash2, Save, ArrowLeft } from "lucide-react";
 import {
-  adminRoutesStore,
   emptyRoute,
   type AdminRoute,
   type AdminActivity,
   type AdminItineraryDay,
   type AdminVideo,
 } from "@/lib/admin/storage";
+import { routesService } from "@/lib/admin/routes-service";
 
 type Props = { initial?: AdminRoute; mode: "create" | "edit" };
 
@@ -30,27 +30,31 @@ function getYouTubeId(url: string): string | null {
 export function RouteForm({ initial, mode }: Props) {
   const navigate = useNavigate();
   const [r, setR] = useState<AdminRoute>(initial ?? emptyRoute());
+  const [saving, setSaving] = useState(false);
 
   const patch = <K extends keyof AdminRoute>(key: K, value: AdminRoute[K]) =>
     setR((p) => ({ ...p, [key]: value }));
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!r.routeName.trim() || !r.departureCity.trim() || !r.destinationCity.trim()) {
       toast.error("Route name, departure and destination are required.");
       return;
     }
+    setSaving(true);
     try {
       if (mode === "create") {
-        adminRoutesStore.create(r);
+        await routesService.create(r);
         toast.success("Route created");
       } else {
-        adminRoutesStore.update(r.id, r);
+        await routesService.update(r.id, r);
         toast.success("Route updated");
       }
       navigate({ to: "/admin/routes" });
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error("Could not save route");
+      setSaving(false);
     }
   };
 
@@ -66,9 +70,11 @@ export function RouteForm({ initial, mode }: Props) {
         </button>
         <button
           type="submit"
+          disabled={saving}
           className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
         >
-          <Save className="h-4 w-4" /> {mode === "create" ? "Create Route" : "Save Changes"}
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {mode === "create" ? "Create Route" : "Save Changes"}
         </button>
       </div>
 
@@ -270,9 +276,11 @@ export function RouteForm({ initial, mode }: Props) {
       <div className="flex justify-end">
         <button
           type="submit"
+          disabled={saving}
           className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
         >
-          <Save className="h-4 w-4" /> {mode === "create" ? "Create Route" : "Save Changes"}
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {mode === "create" ? "Create Route" : "Save Changes"}
         </button>
       </div>
     </form>
