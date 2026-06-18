@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Map, Star, Video, CheckCircle2, PlusCircle } from "lucide-react";
+import { Loader2, Map, Star, Video, CheckCircle2, PlusCircle } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { ProtectedAdmin } from "@/components/admin/ProtectedAdmin";
-import { adminRoutesStore, type AdminRoute } from "@/lib/admin/storage";
+import { routesService } from "@/lib/admin/routes-service";
+import type { AdminRoute } from "@/lib/admin/storage";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Admin" }] }),
@@ -16,7 +17,17 @@ export const Route = createFileRoute("/admin/dashboard")({
 
 function DashboardPage() {
   const [routes, setRoutes] = useState<AdminRoute[]>([]);
-  useEffect(() => setRoutes(adminRoutesStore.list()), []);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    let alive = true;
+    routesService
+      .list()
+      .then((r) => alive && setRoutes(r))
+      .finally(() => alive && setLoading(false));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const stats = useMemo(() => {
     const totalVideos = routes.reduce((sum, r) => sum + r.youtubeVideos.length, 0);
@@ -70,7 +81,14 @@ function DashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {recent.map((r) => (
+              {loading && (
+                <tr>
+                  <td colSpan={5} className="px-5 py-8 text-center text-sm text-slate-500">
+                    <Loader2 className="mx-auto h-4 w-4 animate-spin" />
+                  </td>
+                </tr>
+              )}
+              {!loading && recent.map((r) => (
                 <tr key={r.id}>
                   <td className="px-5 py-3 font-medium text-slate-900">{r.routeName}</td>
                   <td className="px-5 py-3 text-slate-600">{r.departureCity}</td>
@@ -87,7 +105,7 @@ function DashboardPage() {
                   </td>
                 </tr>
               ))}
-              {recent.length === 0 && (
+              {!loading && recent.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-5 py-8 text-center text-sm text-slate-500">
                     No routes yet.
