@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { ROUTES } from "@/data/routes";
 import { RouteCard } from "@/components/RouteCard";
 import { SectionLabel } from "@/components/SectionLabel";
+import { useFirebaseRoutes } from "@/hooks/use-firebase-routes";
 import heroImg from "@/assets/route-shanghai.jpg";
 
 export const Route = createFileRoute("/routes/")({
@@ -17,8 +18,6 @@ export const Route = createFileRoute("/routes/")({
   component: RoutesPage,
 });
 
-const DEPARTURES = ["All", ...Array.from(new Set(ROUTES.map((r) => r.from)))];
-const DESTS = ["All", ...Array.from(new Set(ROUTES.map((r) => r.to)))];
 const ACTIVITIES = ["All", "Culture", "Adventure", "City", "Nature"];
 
 function RoutesPage() {
@@ -28,9 +27,23 @@ function RoutesPage() {
   const [duration, setDuration] = useState("All");
   const [activity, setActivity] = useState("All");
 
+  const { routes: firebaseRoutes } = useFirebaseRoutes();
+
+  // Static routes first, then Firebase routes appended after.
+  const allRoutes = useMemo(() => [...ROUTES, ...firebaseRoutes], [firebaseRoutes]);
+
+  const DEPARTURES = useMemo(
+    () => ["All", ...Array.from(new Set(allRoutes.map((r) => r.from)))],
+    [allRoutes]
+  );
+  const DESTS = useMemo(
+    () => ["All", ...Array.from(new Set(allRoutes.map((r) => r.to)))],
+    [allRoutes]
+  );
+
   const filtered = useMemo(
     () =>
-      ROUTES.filter(
+      allRoutes.filter(
         (r) =>
           (from === "All" || r.from === from) &&
           (to === "All" || r.to === to) &&
@@ -41,7 +54,7 @@ function RoutesPage() {
             (duration === "Medium" && r.days > 7 && r.days <= 10) ||
             (duration === "Long" && r.days > 10))
       ),
-    [from, to, budget, duration, activity]
+    [allRoutes, from, to, budget, duration, activity]
   );
 
   return (
