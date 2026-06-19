@@ -11,6 +11,7 @@ import guilinImg from "@/assets/route-guilin.jpg";
 import { ROUTES } from "@/data/routes";
 import { RouteCard } from "@/components/RouteCard";
 import { SectionLabel } from "@/components/SectionLabel";
+import { useFirebaseRoutes } from "@/hooks/use-firebase-routes";
 import { ArrowRight, Award, Headphones, Hotel, MapPin, ShieldCheck, Sparkles, Star } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -86,7 +87,10 @@ function HomePage() {
     return () => obs.disconnect();
   }, []);
 
-  const featured = ROUTES.slice(0, 6);
+  const { routes: firebaseRoutes } = useFirebaseRoutes();
+  const staticFeatured = ROUTES.slice(0, 6);
+  const firebaseFeatured = firebaseRoutes.filter((r) => r.isFeatured);
+  const featured = [...staticFeatured, ...firebaseFeatured];
 
   return (
     <div className="bg-background text-foreground overflow-x-hidden">
