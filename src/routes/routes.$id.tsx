@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ROUTES } from "@/data/routes";
 import type { TourRoute } from "@/data/routes";
 import { DEFAULT_VIDEOS } from "@/data/routes";
@@ -228,6 +228,39 @@ function Pill({ icon, children }: { icon: React.ReactNode; children: React.React
   return (
     <div className="glass rounded-full px-5 py-2 flex items-center gap-2 text-sm">
       {icon} {children}
+    </div>
+  );
+}
+
+function NotFoundView() {
+  return (
+    <div className="min-h-screen flex items-center justify-center px-6 py-24">
+      <div className="glass-strong relative max-w-xl w-full rounded-3xl p-12 text-center overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-20 pointer-events-none"
+          style={{ background: "radial-gradient(circle at 50% 0%, var(--gold), transparent 60%)" }}
+        />
+        <div className="relative">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-gold/40 text-gold">
+            <Compass className="h-7 w-7" />
+          </div>
+          <SectionLabel><span className="mt-6 inline-block">404 · Off the map</span></SectionLabel>
+          <h1 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">
+            This route isn't <span className="italic text-gold-gradient">on our atlas</span>
+          </h1>
+          <p className="mt-4 text-ivory/65">
+            The journey you're looking for may have been retired or never existed. Browse our full collection or speak with a concierge.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3 justify-center">
+            <Link to="/routes" className="inline-flex items-center gap-2 rounded-full gold-gradient px-6 py-3 text-sm font-medium text-navy-deep">
+              Browse All Routes <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link to="/contact" className="inline-flex items-center gap-2 rounded-full border border-ivory/30 px-6 py-3 text-sm text-ivory hover:border-gold hover:text-gold transition">
+              Contact a Specialist
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
