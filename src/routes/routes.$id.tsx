@@ -4,14 +4,15 @@ import type { TourRoute } from "@/data/routes";
 import { DEFAULT_VIDEOS } from "@/data/routes";
 import { VideoSection, VideoCarousel } from "@/components/VideoSection";
 import { SectionLabel } from "@/components/SectionLabel";
-import { ArrowRight, Calendar, Check, MapPin, Plane, DollarSign, Users } from "lucide-react";
+import { ArrowRight, Calendar, Check, MapPin, Plane, DollarSign, Users, Compass, Loader2 } from "lucide-react";
 import galleryLantern from "@/assets/gallery-lantern.jpg";
 import galleryTea from "@/assets/gallery-tea.jpg";
 import galleryTrain from "@/assets/gallery-train.jpg";
 import heroGreatwall from "@/assets/hero-greatwall.jpg";
 import routeShanghai from "@/assets/route-shanghai.jpg";
 import routeBeijing from "@/assets/route-beijing.jpg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { loadFirebaseRoutes, type PublicRoute } from "@/lib/public/firebase-routes";
 
 export const Route = createFileRoute("/routes/$id")({
   head: ({ params }) => {
@@ -26,20 +27,8 @@ export const Route = createFileRoute("/routes/$id")({
       ],
     };
   },
-  loader: ({ params }) => {
-    const r = ROUTES.find((x) => x.id === params.id);
-    if (!r) throw notFound();
-    return r;
-  },
   component: RouteDetailPage,
-  notFoundComponent: () => (
-    <div className="min-h-screen grid place-items-center text-ivory">
-      <div className="text-center">
-        <h1 className="font-display text-4xl mb-4">Route not found</h1>
-        <Link to="/routes" className="text-gold">← Back to all routes</Link>
-      </div>
-    </div>
-  ),
+  notFoundComponent: NotFoundView,
   errorComponent: ({ error }) => (
     <div className="min-h-screen grid place-items-center text-ivory">
       <p>{error.message}</p>
@@ -48,7 +37,49 @@ export const Route = createFileRoute("/routes/$id")({
 });
 
 function RouteDetailPage() {
-  const r = Route.useLoaderData() as TourRoute;
+  const { id } = Route.useParams();
+  const staticRoute = ROUTES.find((x) => x.id === id);
+  const [firebaseRoute, setFirebaseRoute] = useState<PublicRoute | null>(null);
+  const [status, setStatus] = useState<"resolved" | "loading" | "missing">(
+    staticRoute ? "resolved" : "loading"
+  );
+
+  useEffect(() => {
+    if (staticRoute) {
+      setStatus("resolved");
+      return;
+    }
+    let mounted = true;
+    loadFirebaseRoutes()
+      .then((routes) => {
+        if (!mounted) return;
+        const match = routes.find((r) => r.id === id);
+        if (match) {
+          setFirebaseRoute(match);
+          setStatus("resolved");
+        } else {
+          setStatus("missing");
+        }
+      })
+      .catch(() => mounted && setStatus("missing"));
+    return () => {
+      mounted = false;
+    };
+  }, [id, staticRoute]);
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen grid place-items-center text-ivory">
+        <div className="flex items-center gap-3 text-ivory/70">
+          <Loader2 className="h-5 w-5 animate-spin text-gold" /> Loading route…
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "missing") return <NotFoundView />;
+
+  const r = (staticRoute ?? firebaseRoute) as TourRoute;
 
   return (
     <div>
