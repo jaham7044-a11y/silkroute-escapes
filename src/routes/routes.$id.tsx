@@ -121,7 +121,7 @@ function RouteDetailPage() {
       <section className="mx-auto max-w-7xl px-6 py-24 grid gap-12 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <SectionLabel>Overview</SectionLabel>
-          <h2 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">A bespoke journey, in your own time.</h2>
+          <h2 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">{pub?.shortDescription || r.description}</h2>
           <p className="mt-6 text-ivory/70 leading-relaxed text-lg whitespace-pre-line">{overviewText}</p>
 
           <h3 className="mt-12 font-display text-2xl text-gold">Highlights</h3>
