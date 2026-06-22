@@ -40,6 +40,7 @@ export type AdminRoute = {
   isFeatured: boolean;
   isActive: boolean;
   displayOrder: number;
+  travelType: "Culture" | "Adventure" | "City" | "Nature";
   createdAt: string;
   updatedAt: string;
 };
@@ -70,6 +71,7 @@ function makeRoute(partial: Partial<AdminRoute> & { id: string; routeName: strin
     isFeatured: false,
     isActive: true,
     displayOrder: 0,
+    travelType: "City",
     createdAt: now(),
     updatedAt: now(),
     ...partial,

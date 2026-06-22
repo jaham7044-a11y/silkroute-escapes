@@ -14,9 +14,11 @@ export type PublicRoute = TourRoute & {
   displayOrder?: number;
   galleryImages?: string[];
   fullDescription?: string;
+  activities?: { title: string; description: string; imageUrl: string; dayNumber: number; displayOrder: number }[];
 };
 
 function resolveActivity(a: AdminRoute): TourRoute["activity"] {
+  if (a.travelType) return a.travelType;
   const hay = `${a.routeName} ${a.shortDescription} ${a.fullDescription}`.toLowerCase();
   if (/(adventure|hike|trek|climb)/.test(hay)) return "Adventure";
   if (/(nature|mountain|river|forest|garden)/.test(hay)) return "Nature";
@@ -61,6 +63,9 @@ export function adminToPublic(a: AdminRoute): PublicRoute {
     displayOrder: Number(a.displayOrder ?? 0),
     galleryImages: a.galleryImages,
     fullDescription: a.fullDescription,
+    activities: (a.activities ?? [])
+      .slice()
+      .sort((x, y) => Number(x.displayOrder ?? 0) - Number(y.displayOrder ?? 0)),
   };
 }
 
