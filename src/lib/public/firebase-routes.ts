@@ -13,6 +13,7 @@ export type PublicRoute = TourRoute & {
   isFeatured?: boolean;
   displayOrder?: number;
   galleryImages?: string[];
+  shortDescription?: string;
   fullDescription?: string;
   activities?: { title: string; description: string; imageUrl: string; dayNumber: number; displayOrder: number }[];
 };
@@ -62,6 +63,7 @@ export function adminToPublic(a: AdminRoute): PublicRoute {
     isFeatured: !!a.isFeatured,
     displayOrder: Number(a.displayOrder ?? 0),
     galleryImages: a.galleryImages,
+    shortDescription: a.shortDescription,
     fullDescription: a.fullDescription,
     activities: (a.activities ?? [])
       .slice()
