@@ -53,6 +53,7 @@ function normalize(id: string, data: Record<string, unknown>): AdminRoute {
     isFeatured: !!d.isFeatured,
     isActive: d.isActive !== false,
     displayOrder: Number(d.displayOrder ?? 0),
+    travelType: (d.travelType as AdminRoute["travelType"]) ?? "City",
     createdAt: toIso(d.createdAt),
     updatedAt: toIso(d.updatedAt),
   };

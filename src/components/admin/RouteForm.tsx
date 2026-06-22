@@ -107,6 +107,18 @@ export function RouteForm({ initial, mode }: Props) {
               onChange={(v) => patch("displayOrder", Number(v) || 0)}
             />
           </Field>
+          <Field label="Travel type">
+            <select
+              value={r.travelType}
+              onChange={(e) => patch("travelType", e.target.value as AdminRoute["travelType"])}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
+            >
+              <option value="City">City</option>
+              <option value="Culture">Culture</option>
+              <option value="Adventure">Adventure</option>
+              <option value="Nature">Nature</option>
+            </select>
+          </Field>
         </Grid>
         <Field label="Short description">
           <Input value={r.shortDescription} onChange={(v) => patch("shortDescription", v)} />

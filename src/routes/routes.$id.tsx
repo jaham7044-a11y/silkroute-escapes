@@ -80,6 +80,10 @@ function RouteDetailPage() {
   if (status === "missing") return <NotFoundView />;
 
   const r = (staticRoute ?? firebaseRoute) as TourRoute;
+  const pub = firebaseRoute;
+  const overviewText = pub?.fullDescription?.trim() || r.description;
+  const activities = pub?.activities ?? [];
+  const galleryImages = pub?.galleryImages ?? [];
 
   return (
     <div>
@@ -118,7 +122,7 @@ function RouteDetailPage() {
         <div className="lg:col-span-2">
           <SectionLabel>Overview</SectionLabel>
           <h2 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">A bespoke journey, in your own time.</h2>
-          <p className="mt-6 text-ivory/70 leading-relaxed text-lg">{r.description}</p>
+          <p className="mt-6 text-ivory/70 leading-relaxed text-lg whitespace-pre-line">{overviewText}</p>
 
           <h3 className="mt-12 font-display text-2xl text-gold">Highlights</h3>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -173,11 +177,47 @@ function RouteDetailPage() {
         </div>
       </section>
 
+      {/* ACTIVITIES (admin-driven) */}
+      {activities.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 py-12">
+          <SectionLabel>Experiences</SectionLabel>
+          <h2 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">Curated activities</h2>
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {activities.map((a, i) => (
+              <article key={i} className="group glass rounded-2xl overflow-hidden border border-gold/15">
+                {a.imageUrl ? (
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <img
+                      src={a.imageUrl}
+                      alt={a.title}
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/80 via-navy-deep/10 to-transparent" />
+                    {a.dayNumber ? (
+                      <span className="absolute top-3 left-3 glass rounded-full px-3 py-1 text-[10px] uppercase tracking-widest text-gold">
+                        Day {a.dayNumber}
+                      </span>
+                    ) : null}
+                  </div>
+                ) : null}
+                <div className="p-5">
+                  <h3 className="font-display text-xl text-ivory">{a.title}</h3>
+                  {a.description && (
+                    <p className="mt-2 text-sm text-ivory/65 leading-relaxed">{a.description}</p>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* GALLERY */}
       <section className="mx-auto max-w-7xl px-6 py-12">
         <SectionLabel>Activity Gallery</SectionLabel>
         <h2 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">Moments from the journey</h2>
-        <Gallery cover={r.image} />
+        <Gallery cover={r.image} extra={[...galleryImages, ...activities.map((a) => a.imageUrl).filter(Boolean)]} />
       </section>
 
       {/* MAP */}
@@ -277,8 +317,11 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
   );
 }
 
-function Gallery({ cover }: { cover: string }) {
-  const images = [cover, galleryLantern, galleryTea, heroGreatwall, galleryTrain, routeShanghai, routeBeijing];
+function Gallery({ cover, extra = [] }: { cover: string; extra?: string[] }) {
+  const dedupedExtra = Array.from(new Set(extra.filter(Boolean)));
+  const images = dedupedExtra.length > 0
+    ? [cover, ...dedupedExtra]
+    : [cover, galleryLantern, galleryTea, heroGreatwall, galleryTrain, routeShanghai, routeBeijing];
   const [active, setActive] = useState<string | null>(null);
   return (
     <>
