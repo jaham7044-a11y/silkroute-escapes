@@ -24,6 +24,7 @@ function base(over: Partial<Seed> & Pick<Seed, "id" | "routeName" | "departureCi
     isFeatured: false,
     isActive: true,
     displayOrder: 0,
+    travelType: "City",
     ...over,
   };
 }
