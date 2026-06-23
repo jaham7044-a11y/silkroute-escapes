@@ -7,9 +7,9 @@ import { Check, Mail, MapPin, Phone, Send } from "lucide-react";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — Silk Route Escapes" },
+      { title: "Contact — Luxury China Travels" },
       { name: "description", content: "Request a personalized quote or schedule a consultation with our travel experts." },
-      { property: "og:title", content: "Contact — Silk Route Escapes" },
+      { property: "og:title", content: "Contact — Luxury China Travels" },
       { property: "og:description", content: "Plan your bespoke China journey." },
     ],
   }),

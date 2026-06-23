@@ -35,7 +35,7 @@ export function Header() {
             <span className="font-display text-lg text-gold-gradient">S</span>
           </div>
           <div className="leading-tight">
-            <div className="font-display text-lg tracking-wide text-ivory">Silk Route</div>
+            <div className="font-display text-lg tracking-wide text-ivory">Luxury China Travels</div>
             <div className="text-[10px] tracking-[0.3em] text-gold uppercase">Escapes</div>
           </div>
         </Link>

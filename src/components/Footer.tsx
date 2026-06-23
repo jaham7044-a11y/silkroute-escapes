@@ -12,7 +12,7 @@ export function Footer() {
                 <span className="font-display text-xl text-gold-gradient">S</span>
               </div>
               <div>
-                <div className="font-display text-xl text-ivory">Silk Route Escapes</div>
+                <div className="font-display text-xl text-ivory">Luxury China Travels</div>
                 <div className="text-xs tracking-[0.3em] text-gold uppercase">Luxury Travel · USA → China</div>
               </div>
             </div>
@@ -72,7 +72,7 @@ export function Footer() {
 
         <div className="hairline mt-16 mb-6" />
         <div className="flex flex-col gap-3 sm:flex-row justify-between text-xs text-ivory/40">
-          <div>© {new Date().getFullYear()} Silk Route Escapes. All journeys reserved.</div>
+          <div>© {new Date().getFullYear()} Luxury China Travels. All journeys reserved.</div>
           <div className="flex gap-6">
             <a href="#" className="hover:text-gold">Privacy</a>
             <a href="#" className="hover:text-gold">Terms</a>

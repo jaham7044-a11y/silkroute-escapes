@@ -6,9 +6,9 @@ import { SectionLabel } from "@/components/SectionLabel";
 export const Route = createFileRoute("/destinations")({
   head: () => ({
     meta: [
-      { title: "Destinations — Silk Route Escapes" },
+      { title: "Destinations — Luxury China Travels" },
       { name: "description", content: "Explore China's most extraordinary cities, landscapes, and cultural sites." },
-      { property: "og:title", content: "Destinations — Silk Route Escapes" },
+      { property: "og:title", content: "Destinations — Luxury China Travels" },
       { property: "og:description", content: "Explore China's most extraordinary destinations." },
     ],
   }),

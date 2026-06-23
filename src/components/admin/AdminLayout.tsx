@@ -91,7 +91,7 @@ export function AdminLayout({ title, children }: { title: string; children: Reac
         <div className="flex h-16 items-center justify-between border-b border-slate-200 px-5">
           <Link to="/admin/dashboard" className="flex items-center gap-2" onClick={onNavigate}>
             <Compass className="h-6 w-6 text-amber-600" />
-            <span className="font-serif text-lg font-semibold tracking-tight">Silk Route</span>
+            <span className="font-serif text-lg font-semibold tracking-tight">Luxury China Travels</span>
           </Link>
           <button className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 lg:hidden" onClick={() => setOpen(false)}>
             <X className="h-4 w-4" />

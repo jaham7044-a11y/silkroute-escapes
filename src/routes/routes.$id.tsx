@@ -19,7 +19,7 @@ export const Route = createFileRoute("/routes/$id")({
     const r = ROUTES.find((x) => x.id === params.id);
     return {
       meta: [
-        { title: r ? `${r.title} — Silk Route Escapes` : "Route — Silk Route Escapes" },
+        { title: r ? `${r.title} — Luxury China Travels` : "Route — Luxury China Travels" },
         { name: "description", content: r?.description ?? "Premium guided China tour route." },
         { property: "og:title", content: r?.title ?? "Route" },
         { property: "og:description", content: r?.description ?? "" },

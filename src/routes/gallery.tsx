@@ -15,9 +15,9 @@ import { X } from "lucide-react";
 export const Route = createFileRoute("/gallery")({
   head: () => ({
     meta: [
-      { title: "Gallery — Silk Route Escapes" },
+      { title: "Gallery — Luxury China Travels" },
       { name: "description", content: "Photography from our China journeys — cities, food, nature, luxury hotels, and culture." },
-      { property: "og:title", content: "Gallery — Silk Route Escapes" },
+      { property: "og:title", content: "Gallery — Luxury China Travels" },
       { property: "og:description", content: "Photography from our China journeys." },
     ],
   }),
