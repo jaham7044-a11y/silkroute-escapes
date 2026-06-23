@@ -162,7 +162,7 @@ export function RouteForm({ initial, mode }: Props) {
       </Section>
 
       {/* 3. Videos */}
-      <Section title="YouTube Videos" subtitle="Add unlimited videos for the route details page">
+      <Section title="Travel Videos" subtitle="Shown in the 'Travel Videos' grid on the route page">
         <RepeaterList
           items={r.youtubeVideos}
           onChange={(v) => patch("youtubeVideos", v)}
@@ -192,7 +192,41 @@ export function RouteForm({ initial, mode }: Props) {
               </>
             );
           }}
-          addLabel="Add video"
+          addLabel="Add travel video"
+        />
+      </Section>
+
+      <Section title="Journey Through Video" subtitle="Shown in the 'Journey Through Video' carousel on the route page">
+        <RepeaterList
+          items={r.journeyVideos}
+          onChange={(v) => patch("journeyVideos", v)}
+          newItem={(): AdminVideo => ({ title: "", youtubeUrl: "", description: "" })}
+          render={(item, update) => {
+            const id = getYouTubeId(item.youtubeUrl);
+            return (
+              <>
+                <Grid cols={2}>
+                  <Field label="Title">
+                    <Input value={item.title} onChange={(v) => update({ ...item, title: v })} />
+                  </Field>
+                  <Field label="YouTube URL">
+                    <Input value={item.youtubeUrl} onChange={(v) => update({ ...item, youtubeUrl: v })} />
+                  </Field>
+                </Grid>
+                <Field label="Description">
+                  <Textarea value={item.description ?? ""} onChange={(v) => update({ ...item, description: v })} rows={2} />
+                </Field>
+                {id && (
+                  <img
+                    src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
+                    alt=""
+                    className="h-32 w-56 rounded-md object-cover"
+                  />
+                )}
+              </>
+            );
+          }}
+          addLabel="Add journey video"
         />
       </Section>
 
