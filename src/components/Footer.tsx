@@ -9,7 +9,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3">
               <div className="grid h-12 w-12 place-items-center rounded-full border border-gold/40">
-                <span className="font-display text-xl text-gold-gradient">S</span>
+                <span className="font-display text-xl text-gold-gradient">L</span>
               </div>
               <div>
                 <div className="font-display text-xl text-ivory">Luxury China Travels</div>
