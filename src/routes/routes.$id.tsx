@@ -184,25 +184,6 @@ function RouteDetailPage() {
         <Gallery cover={r.image} extra={[...galleryImages, ...activities.map((a) => a.imageUrl).filter(Boolean)]} />
       </section>
 
-      {/* MAP */}
-      <section className="mx-auto max-w-7xl px-6 py-20">
-        <div className="glass-strong rounded-3xl p-10 md:p-16 grid gap-10 md:grid-cols-2 items-center">
-          <div>
-            <SectionLabel>Your Route</SectionLabel>
-            <h2 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">
-              {r.from} <span className="text-gold">→</span> {r.to}
-            </h2>
-            <p className="mt-4 text-ivory/70">A direct, premium pathway designed by our team — fly-in, transfer, and we handle the rest. Trans-Pacific flight with onward private transfer in China.</p>
-            <div className="mt-8 grid grid-cols-3 gap-4 text-center">
-              <div className="glass rounded-xl py-3"><div className="font-display text-2xl text-gold">~13h</div><div className="text-[10px] uppercase tracking-widest text-ivory/55 mt-1">Flight</div></div>
-              <div className="glass rounded-xl py-3"><div className="font-display text-2xl text-gold">{r.days}</div><div className="text-[10px] uppercase tracking-widest text-ivory/55 mt-1">Days</div></div>
-              <div className="glass rounded-xl py-3"><div className="font-display text-2xl text-gold">5★</div><div className="text-[10px] uppercase tracking-widest text-ivory/55 mt-1">Hotels</div></div>
-            </div>
-          </div>
-          <RouteMap from={r.from} to={r.to} />
-        </div>
-      </section>
-
       {/* TRAVEL VIDEOS */}
       <VideoSection videos={(pub?.videos?.length ? pub.videos : r.videos) ?? DEFAULT_VIDEOS} />
 
