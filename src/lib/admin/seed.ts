@@ -19,6 +19,7 @@ function base(over: Partial<Seed> & Pick<Seed, "id" | "routeName" | "departureCi
     coverImageUrl: "",
     galleryImages: [],
     youtubeVideos: [],
+    journeyVideos: [],
     activities: [],
     itinerary: [],
     isFeatured: false,

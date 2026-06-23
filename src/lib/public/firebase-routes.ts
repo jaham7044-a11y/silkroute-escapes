@@ -15,6 +15,7 @@ export type PublicRoute = TourRoute & {
   galleryImages?: string[];
   shortDescription?: string;
   fullDescription?: string;
+  journeyVideos?: { title: string; youtubeUrl: string; description?: string }[];
   activities?: { title: string; description: string; imageUrl: string; dayNumber: number; displayOrder: number }[];
 };
 
@@ -55,6 +56,11 @@ export function adminToPublic(a: AdminRoute): PublicRoute {
       detail: d.description,
     })),
     videos: (a.youtubeVideos ?? []).map((v) => ({
+      title: v.title,
+      youtubeUrl: v.youtubeUrl,
+      description: v.description,
+    })),
+    journeyVideos: (a.journeyVideos ?? []).map((v) => ({
       title: v.title,
       youtubeUrl: v.youtubeUrl,
       description: v.description,

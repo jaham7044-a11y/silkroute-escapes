@@ -103,7 +103,7 @@ export const ROUTES: TourRoute[] = [
     duration: "12 Days / 11 Nights",
     days: 12,
     price: 3199,
-    description: "The signature Silk Route experience — Beijing, Xi'an's Terracotta Army, and Shanghai by private bullet train.",
+    description: "The signature Luxury China Travels experience — Beijing, Xi'an's Terracotta Army, and Shanghai by private bullet train.",
     image: xian,
     activity: "Culture",
     highlights: ["Great Wall", "Terracotta Army", "Forbidden City", "Bullet Train", "Shanghai Bund", "Imperial Banquet"],

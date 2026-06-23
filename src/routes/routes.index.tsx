@@ -9,9 +9,9 @@ import heroImg from "@/assets/route-shanghai.jpg";
 export const Route = createFileRoute("/routes/")({
   head: () => ({
     meta: [
-      { title: "All Routes — Silk Route Escapes" },
+      { title: "All Routes — Luxury China Travels" },
       { name: "description", content: "Browse premium guided routes from US cities to Shanghai, Beijing, Guangzhou and beyond." },
-      { property: "og:title", content: "All Routes — Silk Route Escapes" },
+      { property: "og:title", content: "All Routes — Luxury China Travels" },
       { property: "og:description", content: "Premium guided routes from the USA to China." },
     ],
   }),

@@ -32,11 +32,11 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
         <Link to="/" className="group flex items-center gap-3">
           <div className="grid h-10 w-10 place-items-center rounded-full border border-gold/40 transition-transform group-hover:rotate-12">
-            <span className="font-display text-lg text-gold-gradient">S</span>
+            <span className="font-display text-lg text-gold-gradient">L</span>
           </div>
           <div className="leading-tight">
-            <div className="font-display text-lg tracking-wide text-ivory">Silk Route</div>
-            <div className="text-[10px] tracking-[0.3em] text-gold uppercase">Escapes</div>
+            <div className="font-display text-lg tracking-wide text-ivory">Luxury China Travels</div>
+            <div className="text-[10px] tracking-[0.3em] text-gold uppercase">China</div>
           </div>
         </Link>
 

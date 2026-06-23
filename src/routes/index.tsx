@@ -17,9 +17,9 @@ import { ArrowRight, Award, Headphones, Hotel, MapPin, ShieldCheck, Sparkles, St
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Silk Route Escapes — Luxury China Travel from the USA" },
+      { title: "Luxury China Travels — Luxury China Travel from the USA" },
       { name: "description", content: "Concierge-led luxury travel packages from American cities to Beijing, Shanghai, Xi'an and beyond. 5★ hotels, private guides, unforgettable journeys." },
-      { property: "og:title", content: "Silk Route Escapes — Luxury China Travel" },
+      { property: "og:title", content: "Luxury China Travels — Luxury China Travel" },
       { property: "og:description", content: "Concierge-led luxury journeys from the USA to China." },
     ],
   }),
@@ -165,7 +165,7 @@ function HomePage() {
           <div className="max-w-2xl">
             <SectionLabel>Why Travel With Us</SectionLabel>
             <h2 className="mt-4 font-display text-5xl md:text-6xl text-ivory leading-tight">
-              The Silk Route <span className="italic text-gold-gradient">difference</span>
+              The Luxury China Travels <span className="italic text-gold-gradient">difference</span>
             </h2>
           </div>
           <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">

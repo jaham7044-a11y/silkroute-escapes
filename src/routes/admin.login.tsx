@@ -6,7 +6,7 @@ import { useAdminAuth } from "@/lib/admin/auth";
 import { FirebaseError } from "firebase/app";
 
 export const Route = createFileRoute("/admin/login")({
-  head: () => ({ meta: [{ title: "Admin Login — Silk Route Escapes" }] }),
+  head: () => ({ meta: [{ title: "Admin Login — Luxury China Travels" }] }),
   component: AdminLoginPage,
 });
 
@@ -53,7 +53,7 @@ function AdminLoginPage() {
           <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10 ring-1 ring-amber-500/30">
             <Compass className="h-6 w-6 text-amber-400" />
           </div>
-          <h1 className="font-serif text-2xl font-semibold text-white">Silk Route Admin</h1>
+          <h1 className="font-serif text-2xl font-semibold text-white">Luxury China Travels Admin</h1>
           <p className="mt-1 text-sm text-slate-400">Sign in to manage your tours</p>
         </div>
 

@@ -5,9 +5,9 @@ import heroImg from "@/assets/route-beijing.jpg";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — Silk Route Escapes" },
-      { name: "description", content: "Travel experts connecting America & China. Meet the team behind Silk Route Escapes." },
-      { property: "og:title", content: "About — Silk Route Escapes" },
+      { title: "About — Luxury China Travels" },
+      { name: "description", content: "Travel experts connecting America & China. Meet the team behind Luxury China Travels." },
+      { property: "og:title", content: "About — Luxury China Travels" },
       { property: "og:description", content: "Travel experts connecting America & China." },
     ],
   }),
@@ -42,7 +42,7 @@ function AboutPage() {
           <span className="text-gold-gradient italic"> not as a tour operator, but as your personal travel atelier.</span>
         </p>
         <p className="mt-8 text-ivory/65 leading-relaxed">
-          Silk Route Escapes was founded on a simple belief: travel between America and China should be effortless, immersive, and unmistakably luxurious. We work only with vetted 5★ properties, licensed expert guides, and trusted ground partners. Every journey is privately concierge-led from your first inquiry to your return flight.
+          Luxury China Travels was founded on a simple belief: travel between America and China should be effortless, immersive, and unmistakably luxurious. We work only with vetted 5★ properties, licensed expert guides, and trusted ground partners. Every journey is privately concierge-led from your first inquiry to your return flight.
         </p>
       </section>
 

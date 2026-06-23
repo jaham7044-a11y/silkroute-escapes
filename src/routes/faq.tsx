@@ -6,10 +6,10 @@ import { Plus, Minus } from "lucide-react";
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
-      { title: "FAQ — Silk Route Escapes" },
+      { title: "FAQ — Luxury China Travels" },
       { name: "description", content: "Answers to common questions about visas, flights, customization, payments, and private tours." },
-      { property: "og:title", content: "FAQ — Silk Route Escapes" },
-      { property: "og:description", content: "Common questions about traveling with Silk Route Escapes." },
+      { property: "og:title", content: "FAQ — Luxury China Travels" },
+      { property: "og:description", content: "Common questions about traveling with Luxury China Travels." },
     ],
   }),
   component: FaqPage,
@@ -20,7 +20,7 @@ const QA = [
   { q: "Are flights included?", a: "International flights are quoted separately so you retain full control of class, miles, and routing. We're happy to book on your behalf at preferred rates." },
   { q: "Can packages be customized?", a: "Absolutely — every itinerary is a starting point. Add private chefs, helicopter transfers, additional cities, or extend your stay. Just ask." },
   { q: "What payment methods are accepted?", a: "All major credit cards, ACH, and wire transfer. A 25% deposit secures your dates; the balance is due 45 days before departure." },
-  { q: "Do you offer private tours?", a: "All Silk Route journeys are private by default. You'll have a dedicated guide and driver for the duration of your trip." },
+  { q: "Do you offer private tours?", a: "All Luxury China Travels journeys are private by default. You'll have a dedicated guide and driver for the duration of your trip." },
   { q: "Can families travel together?", a: "Yes. We design multi-generational journeys with family-friendly hotels, kid-engaging guides, and flexible pacing." },
 ];
 
