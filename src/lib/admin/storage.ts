@@ -35,6 +35,7 @@ export type AdminRoute = {
   coverImageUrl: string;
   galleryImages: string[];
   youtubeVideos: AdminVideo[];
+  journeyVideos: AdminVideo[];
   activities: AdminActivity[];
   itinerary: AdminItineraryDay[];
   isFeatured: boolean;
@@ -66,6 +67,7 @@ function makeRoute(partial: Partial<AdminRoute> & { id: string; routeName: strin
     coverImageUrl: "",
     galleryImages: [],
     youtubeVideos: [],
+    journeyVideos: [],
     activities: [],
     itinerary: [],
     isFeatured: false,

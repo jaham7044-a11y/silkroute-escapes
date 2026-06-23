@@ -177,42 +177,6 @@ function RouteDetailPage() {
         </div>
       </section>
 
-      {/* ACTIVITIES (admin-driven) */}
-      {activities.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 py-12">
-          <SectionLabel>Experiences</SectionLabel>
-          <h2 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">Curated activities</h2>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {activities.map((a, i) => (
-              <article key={i} className="group glass rounded-2xl overflow-hidden border border-gold/15">
-                {a.imageUrl ? (
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <img
-                      src={a.imageUrl}
-                      alt={a.title}
-                      loading="lazy"
-                      className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/80 via-navy-deep/10 to-transparent" />
-                    {a.dayNumber ? (
-                      <span className="absolute top-3 left-3 glass rounded-full px-3 py-1 text-[10px] uppercase tracking-widest text-gold">
-                        Day {a.dayNumber}
-                      </span>
-                    ) : null}
-                  </div>
-                ) : null}
-                <div className="p-5">
-                  <h3 className="font-display text-xl text-ivory">{a.title}</h3>
-                  {a.description && (
-                    <p className="mt-2 text-sm text-ivory/65 leading-relaxed">{a.description}</p>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* GALLERY */}
       <section className="mx-auto max-w-7xl px-6 py-12">
         <SectionLabel>Activity Gallery</SectionLabel>
@@ -240,10 +204,18 @@ function RouteDetailPage() {
       </section>
 
       {/* TRAVEL VIDEOS */}
-      <VideoSection videos={r.videos ?? DEFAULT_VIDEOS} />
+      <VideoSection videos={(pub?.videos?.length ? pub.videos : r.videos) ?? DEFAULT_VIDEOS} />
 
       {/* JOURNEY THROUGH VIDEO — CAROUSEL */}
-      <VideoCarousel videos={r.videos ?? DEFAULT_VIDEOS} />
+      <VideoCarousel
+        videos={
+          (pub?.journeyVideos?.length
+            ? pub.journeyVideos
+            : pub?.videos?.length
+              ? pub.videos
+              : r.videos) ?? DEFAULT_VIDEOS
+        }
+      />
 
       {/* CTA */}
       <section className="mx-auto max-w-7xl px-6 pb-24">
