@@ -1,4 +1,4 @@
-name: Deploy TanStack Start App to Namecheap
+name: Build and Deploy TanStack Start App to Namecheap
 
 on:
   push:
@@ -6,14 +6,25 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy source code to Namecheap
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy built app to Namecheap
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -26,5 +37,5 @@ jobs:
             **/.git/**
             **/node_modules/**
             **/.github/**
-            **/dist/**
             **/.DS_Store
+            **/src/**
