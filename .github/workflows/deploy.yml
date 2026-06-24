@@ -1,39 +1,32 @@
-name: Deploy Vite React App to Namecheap
+name: Deploy TanStack Start App to Namecheap
 
 on:
-  push:
-    branches:
-      - main
+push:
+branches:
+- main
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+deploy:
+runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+```
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build project
-        run: npm run build
-
-      - name: Check build output
-        run: |
-          echo "Dist files:"
-          find dist -maxdepth 3 -type f | head -100
-
-      - name: Deploy dist client folder to Namecheap
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/client/
-          server-dir: /
+  - name: Deploy source code to Namecheap
+    uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+    with:
+      server: ${{ secrets.FTP_SERVER }}
+      username: ${{ secrets.FTP_USERNAME }}
+      password: ${{ secrets.FTP_PASSWORD }}
+      local-dir: ./
+      server-dir: /
+      exclude: |
+        **/.git*
+        **/.git/**
+        **/node_modules/**
+        **/.github/**
+        **/dist/**
+        **/.DS_Store
+```
