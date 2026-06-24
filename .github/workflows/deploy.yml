@@ -19,12 +19,17 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build project
         run: npm run build
 
-      - name: Deploy dist folder to Namecheap
+      - name: Check build output
+        run: |
+          echo "Dist files:"
+          find dist -maxdepth 3 -type f | head -100
+
+      - name: Deploy dist client folder to Namecheap
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
