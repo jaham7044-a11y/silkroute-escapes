@@ -47,6 +47,7 @@ function normalize(id: string, data: Record<string, unknown>): AdminRoute {
     includedItems: d.includedItems ?? [],
     coverImageUrl: d.coverImageUrl ?? "",
     galleryImages: d.galleryImages ?? [],
+    feedbackImages: d.feedbackImages ?? [],
     youtubeVideos: d.youtubeVideos ?? [],
     journeyVideos: (d as { journeyVideos?: unknown }).journeyVideos as AdminRoute["journeyVideos"] ?? [],
     activities: d.activities ?? [],

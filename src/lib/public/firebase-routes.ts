@@ -13,6 +13,7 @@ export type PublicRoute = TourRoute & {
   isFeatured?: boolean;
   displayOrder?: number;
   galleryImages?: string[];
+  feedbackImages?: string[];
   shortDescription?: string;
   fullDescription?: string;
   journeyVideos?: { title: string; youtubeUrl: string; description?: string }[];
@@ -65,6 +66,7 @@ export function adminToPublic(a: AdminRoute): PublicRoute {
       youtubeUrl: v.youtubeUrl,
       description: v.description,
     })),
+    feedbackImages: a.feedbackImages,
     source: "firebase",
     isFeatured: !!a.isFeatured,
     displayOrder: Number(a.displayOrder ?? 0),

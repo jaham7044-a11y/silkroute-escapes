@@ -84,6 +84,8 @@ function RouteDetailPage() {
   const overviewText = pub?.fullDescription?.trim() || r.description;
   const activities = pub?.activities ?? [];
   const galleryImages = pub?.galleryImages ?? [];
+  const feedbackImages = pub?.feedbackImages ?? [];
+  const galleryExtras = [...galleryImages, ...activities.map((a) => a.imageUrl).filter(Boolean)];
 
   return (
     <div>
@@ -178,11 +180,13 @@ function RouteDetailPage() {
       </section>
 
       {/* GALLERY */}
-      <section className="mx-auto max-w-7xl px-6 py-12">
-        <SectionLabel>Activity Gallery</SectionLabel>
-        <h2 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">Moments from the journey</h2>
-        <Gallery cover={r.image} extra={[...galleryImages, ...activities.map((a) => a.imageUrl).filter(Boolean)]} />
-      </section>
+      {galleryExtras.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 py-12">
+          <SectionLabel>Activity Gallery</SectionLabel>
+          <h2 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">Moments from the journey</h2>
+          <Gallery cover={r.image} extra={galleryExtras} />
+        </section>
+      )}
 
       {/* TRAVEL VIDEOS */}
       <VideoSection videos={(pub?.videos?.length ? pub.videos : r.videos) ?? DEFAULT_VIDEOS} />
@@ -197,6 +201,14 @@ function RouteDetailPage() {
               : r.videos) ?? DEFAULT_VIDEOS
         }
       />
+
+      {feedbackImages.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 py-12">
+          <SectionLabel>Feedback from real clients</SectionLabel>
+          <h2 className="mt-4 font-display text-4xl md:text-5xl text-ivory leading-tight">Real traveler memories</h2>
+          <Gallery cover={r.image} extra={feedbackImages} />
+        </section>
+      )}
 
       {/* CTA */}
       <section className="mx-auto max-w-7xl px-6 pb-24">
@@ -272,9 +284,7 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
 
 function Gallery({ cover, extra = [] }: { cover: string; extra?: string[] }) {
   const dedupedExtra = Array.from(new Set(extra.filter(Boolean)));
-  const images = dedupedExtra.length > 0
-    ? [cover, ...dedupedExtra]
-    : [cover, galleryLantern, galleryTea, heroGreatwall, galleryTrain, routeShanghai, routeBeijing];
+  const images = dedupedExtra.length > 0 ? dedupedExtra : [cover];
   const [active, setActive] = useState<string | null>(null);
   return (
     <>

@@ -42,6 +42,7 @@ export type AdminRoute = {
   isActive: boolean;
   displayOrder: number;
   travelType: "Culture" | "Adventure" | "City" | "Nature";
+  feedbackImages: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -66,6 +67,7 @@ function makeRoute(partial: Partial<AdminRoute> & { id: string; routeName: strin
     includedItems: ["Hotel", "Airport Transfers", "Guided Tours", "Transportation", "Breakfast", "24/7 Support"],
     coverImageUrl: "",
     galleryImages: [],
+    feedbackImages: [],
     youtubeVideos: [],
     journeyVideos: [],
     activities: [],
@@ -100,6 +102,10 @@ const SAMPLE_ROUTES: AdminRoute[] = [
     galleryImages: [
       "https://images.unsplash.com/photo-1545893835-abaa50cbe628?w=1200&q=80",
       "https://images.unsplash.com/photo-1506816561089-5cc37b3aa9b0?w=1200&q=80",
+    ],
+    feedbackImages: [
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=1200&q=80",
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=1200&q=80",
     ],
     youtubeVideos: SAMPLE_VIDEOS,
     itinerary: [

@@ -159,6 +159,15 @@ export function RouteForm({ initial, mode }: Props) {
             url ? <img src={url} alt="" className="mt-2 h-20 w-32 rounded-md object-cover" /> : null
           }
         />
+        <ListField
+          label="Feedback from real clients"
+          items={r.feedbackImages}
+          onChange={(v) => patch("feedbackImages", v)}
+          placeholder="https://…"
+          renderPreview={(url) =>
+            url ? <img src={url} alt="" className="mt-2 h-20 w-32 rounded-md object-cover" /> : null
+          }
+        />
       </Section>
 
       {/* 3. Videos */}
