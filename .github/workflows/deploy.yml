@@ -32,10 +32,10 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
           server-dir: /
+          state-name: .ftp-deploy-sync-state-node.json
           exclude: |
             **/.git*
             **/.git/**
             **/node_modules/**
             **/.github/**
             **/.DS_Store
-            **/src/**
