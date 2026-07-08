@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SectionLabel } from "@/components/SectionLabel";
 import { ROUTES } from "@/data/routes";
-import { Check, Mail, MapPin, Phone, Send } from "lucide-react";
+import { submitContactEnquiry } from "@/lib/api/contact.functions";
+import { Check, Loader2, Mail, MapPin, Phone, Send } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -20,19 +21,63 @@ function ContactPage() {
   const [sent, setSent] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggle = (id: string) =>
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const errs: Record<string, string> = {};
-    if (!String(fd.get("name") ?? "").trim()) errs.name = "Required";
-    if (!String(fd.get("email") ?? "").trim()) errs.email = "Required";
+
+    const name = String(fd.get("name") ?? "").trim();
+    const email = String(fd.get("email") ?? "").trim();
+
+    if (!name) errs.name = "Required";
+    if (!email) errs.email = "Required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = "Enter a valid email";
+
     setErrors(errs);
     if (Object.keys(errs).length) return;
-    setSent(true);
+
+    setSubmitError(null);
+    setIsSubmitting(true);
+
+    try {
+      const destinations = selected
+        .map((id) => ROUTES.find((r) => r.id === id))
+        .filter((route): route is (typeof ROUTES)[number] => route != null)
+        .map((route) => `${route.from} → ${route.to}`)
+        .join(" · ");
+
+      const travelersRaw = String(fd.get("travelers") ?? "").trim();
+      const result = await submitContactEnquiry({
+        data: {
+          name,
+          email,
+          phone: String(fd.get("phone") ?? "").trim() || undefined,
+          country: String(fd.get("country") ?? "").trim() || undefined,
+          dates: String(fd.get("dates") ?? "").trim() || undefined,
+          travelers: travelersRaw ? Number(travelersRaw) : undefined,
+          destinations: destinations || undefined,
+          budget: String(fd.get("budget") ?? "").trim() || undefined,
+          message: String(fd.get("message") ?? "").trim() || undefined,
+        },
+      });
+
+      if (!result.success) {
+        setSubmitError(result.message);
+        return;
+      }
+
+      setSent(true);
+    } catch {
+      setSubmitError("Unable to send your message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -60,12 +105,12 @@ function ContactPage() {
           ) : (
             <form onSubmit={onSubmit} className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
-                <Field label="Full Name" name="name" required error={errors.name} />
-                <Field label="Email" name="email" type="email" required error={errors.email} />
-                <Field label="Phone" name="phone" type="tel" />
-                <Field label="Country" name="country" />
-                <Field label="Preferred Travel Dates" name="dates" placeholder="e.g. October 2026" />
-                <Field label="Number of Travelers" name="travelers" type="number" defaultValue={2} min={1} />
+                <Field label="Full Name" name="name" required error={errors.name} disabled={isSubmitting} />
+                <Field label="Email" name="email" type="email" required error={errors.email} disabled={isSubmitting} />
+                <Field label="Phone" name="phone" type="tel" disabled={isSubmitting} />
+                <Field label="Country" name="country" disabled={isSubmitting} />
+                <Field label="Preferred Travel Dates" name="dates" placeholder="e.g. October 2026" disabled={isSubmitting} />
+                <Field label="Number of Travelers" name="travelers" type="number" defaultValue={2} min={1} disabled={isSubmitting} />
               </div>
 
               <div>
@@ -74,12 +119,13 @@ function ContactPage() {
                   {ROUTES.map((r) => (
                     <label key={r.id} className={`flex items-center gap-3 rounded-xl px-4 py-3 cursor-pointer border transition ${
                       selected.includes(r.id) ? "border-gold bg-gold/10" : "border-gold/20 hover:border-gold/50"
-                    }`}>
+                    } ${isSubmitting ? "opacity-60 pointer-events-none" : ""}`}>
                       <input
                         type="checkbox"
                         className="accent-[color:var(--gold)]"
                         checked={selected.includes(r.id)}
                         onChange={() => toggle(r.id)}
+                        disabled={isSubmitting}
                       />
                       <span className="text-sm text-ivory">{r.from} → {r.to}</span>
                     </label>
@@ -89,7 +135,7 @@ function ContactPage() {
 
               <div>
                 <label className="text-[10px] uppercase tracking-[0.25em] text-gold">Travel Budget</label>
-                <select name="budget" className="mt-2 w-full bg-transparent border-b border-gold/30 text-ivory py-3 focus:outline-none focus:border-gold">
+                <select name="budget" disabled={isSubmitting} className="mt-2 w-full bg-transparent border-b border-gold/30 text-ivory py-3 focus:outline-none focus:border-gold disabled:opacity-60">
                   <option className="bg-navy-deep">$2,000 — $3,000</option>
                   <option className="bg-navy-deep">$3,000 — $5,000</option>
                   <option className="bg-navy-deep">$5,000 — $10,000</option>
@@ -103,16 +149,33 @@ function ContactPage() {
                   name="message"
                   rows={5}
                   maxLength={1000}
-                  className="mt-2 w-full bg-transparent border-b border-gold/30 text-ivory py-3 focus:outline-none focus:border-gold resize-none"
+                  disabled={isSubmitting}
+                  className="mt-2 w-full bg-transparent border-b border-gold/30 text-ivory py-3 focus:outline-none focus:border-gold resize-none disabled:opacity-60"
                   placeholder="Anything you'd love to experience…"
                 />
               </div>
 
+              {submitError && (
+                <p className="text-sm text-destructive" role="alert">{submitError}</p>
+              )}
+
               <div className="flex flex-wrap gap-4 pt-2">
-                <button type="submit" className="inline-flex items-center gap-3 rounded-full gold-gradient px-8 py-4 text-sm font-medium text-navy-deep shadow-luxe">
-                  <Send className="h-4 w-4" /> Request Quote
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-3 rounded-full gold-gradient px-8 py-4 text-sm font-medium text-navy-deep shadow-luxe disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" /> Sending…
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4" /> Request Quote
+                    </>
+                  )}
                 </button>
-                <button type="button" className="inline-flex items-center gap-3 rounded-full border border-gold/40 px-8 py-4 text-sm text-gold hover:bg-gold/10">
+                <button type="button" disabled={isSubmitting} className="inline-flex items-center gap-3 rounded-full border border-gold/40 px-8 py-4 text-sm text-gold hover:bg-gold/10 disabled:opacity-60 disabled:cursor-not-allowed">
                   Schedule Consultation
                 </button>
               </div>
@@ -146,7 +209,7 @@ function Field({ label, name, error, ...props }: { label: string; name: string; 
       <input
         name={name}
         {...props}
-        className="mt-2 w-full bg-transparent border-b border-gold/30 text-ivory py-3 focus:outline-none focus:border-gold placeholder:text-ivory/30"
+        className="mt-2 w-full bg-transparent border-b border-gold/30 text-ivory py-3 focus:outline-none focus:border-gold placeholder:text-ivory/30 disabled:opacity-60"
       />
       {error && <div className="mt-1 text-xs text-destructive">{error}</div>}
     </div>
