@@ -24,3 +24,10 @@ export function getServerConfig() {
     //   stripeSecretKey: process.env.STRIPE_SECRET_KEY,
   };
 }
+
+export function getEmailConfig() {
+  return {
+    user: process.env.EMAIL_USER,
+    appPassword: process.env.EMAIL_APP_PASSWORD,
+  };
+}
