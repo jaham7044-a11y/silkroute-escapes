@@ -2,7 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { sendContactEnquiryEmail } from "../contact/contact-email.server";
-import { createContactDebugId, logContactError, logContactInfo } from "../contact/contact-log.server";
+import {
+  createContactDebugId,
+  formatError,
+  getEmailConfigDiagnostics,
+  logContactError,
+  logContactInfo,
+} from "../contact/contact-log.server";
 
 const contactInputSchema = z.object({
   name: z.string().trim().min(1, "Name is required."),
@@ -20,14 +26,16 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
   .validator(contactInputSchema)
   .handler(async ({ data }) => {
     const debugId = createContactDebugId();
+    const emailConfig = getEmailConfigDiagnostics();
 
-    await logContactInfo("Contact enquiry submission received", {
+    const firebaseLog = await logContactInfo("Contact enquiry submission received", {
       debugId,
       customerEmail: data.email,
       customerName: data.name,
       hasPhone: Boolean(data.phone),
       hasMessage: Boolean(data.message),
       destinations: data.destinations ?? null,
+      emailConfig,
     });
 
     try {
@@ -69,6 +77,14 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
         message: isConfigError
           ? `Contact form is temporarily unavailable. Please email us directly. Ref: ${debugId}`
           : `Unable to send your message. Please try again. Ref: ${debugId}`,
+        // Temporary debug payload for production troubleshooting — remove after fix.
+        debug: {
+          debugId,
+          stage: "server-handler",
+          emailConfig,
+          firebaseLog,
+          error: formatError(error),
+        },
       };
     }
   });

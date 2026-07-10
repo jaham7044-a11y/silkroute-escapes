@@ -22,6 +22,7 @@ function ContactPage() {
   const [selected, setSelected] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<unknown>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggle = (id: string) =>
@@ -43,6 +44,7 @@ function ContactPage() {
     if (Object.keys(errs).length) return;
 
     setSubmitError(null);
+    setDebugInfo(null);
     setIsSubmitting(true);
 
     try {
@@ -69,12 +71,21 @@ function ContactPage() {
 
       if (!result.success) {
         setSubmitError(result.message);
+        setDebugInfo("debug" in result ? result.debug : { note: "No debug payload returned from server." });
         return;
       }
 
       setSent(true);
-    } catch {
+    } catch (error) {
       setSubmitError("Unable to send your message. Please try again.");
+      setDebugInfo({
+        stage: "client-catch",
+        note: "Request failed before a normal server response was received.",
+        error:
+          error instanceof Error
+            ? { name: error.name, message: error.message, stack: error.stack }
+            : { message: String(error) },
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -156,7 +167,14 @@ function ContactPage() {
               </div>
 
               {submitError && (
-                <p className="text-sm text-destructive" role="alert">{submitError}</p>
+                <div className="space-y-3" role="alert">
+                  <p className="text-sm text-destructive">{submitError}</p>
+                  {debugInfo != null && (
+                    <pre className="overflow-x-auto rounded-xl border border-destructive/40 bg-navy-deep/80 p-4 text-left text-[11px] leading-relaxed text-ivory/85 whitespace-pre-wrap break-words">
+                      {JSON.stringify(debugInfo, null, 2)}
+                    </pre>
+                  )}
+                </div>
               )}
 
               <div className="flex flex-wrap gap-4 pt-2">

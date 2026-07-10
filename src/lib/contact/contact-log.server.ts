@@ -20,7 +20,7 @@ const firebaseApp = getApps().some((app) => app.name === "contact-form-logs")
 
 const db = getFirestore(firebaseApp);
 
-function formatError(error: unknown) {
+export function formatError(error: unknown) {
   if (error instanceof Error) {
     const extra: LogMeta = {};
 
