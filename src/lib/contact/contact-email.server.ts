@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import type { Transporter } from "nodemailer";
 
 import { getEmailConfig } from "../config.server";
+import { getEmailConfigDiagnostics, logContactError, logContactInfo } from "./contact-log.server";
 
 export type ContactEnquiry = {
   name: string;
@@ -17,8 +18,12 @@ export type ContactEnquiry = {
 
 function getTransporter(): Transporter {
   const { user, appPassword } = getEmailConfig();
+  const diagnostics = getEmailConfigDiagnostics();
+
+  logContactInfo("Creating SMTP transporter", diagnostics);
 
   if (!user || !appPassword) {
+    logContactError("Email configuration missing", new Error("Email is not configured"), diagnostics);
     throw new Error("Email is not configured. Set EMAIL_USER and EMAIL_APP_PASSWORD.");
   }
 
@@ -151,14 +156,39 @@ function escapeHtml(value: string): string {
 
 export async function sendContactEnquiryEmail(enquiry: ContactEnquiry): Promise<void> {
   const { user } = getEmailConfig();
+
+  logContactInfo("Sending contact enquiry email", {
+    customerEmail: enquiry.email,
+    customerName: enquiry.name,
+    destinations: enquiry.destinations ?? null,
+    emailConfig: getEmailConfigDiagnostics(),
+  });
+
   const transporter = getTransporter();
 
-  await transporter.sendMail({
-    from: `"Luxury China Travels Website" <${user}>`,
-    to: user,
-    replyTo: enquiry.email,
-    subject: buildSubject(enquiry),
-    text: buildPlainText(enquiry),
-    html: buildHtml(enquiry),
-  });
+  try {
+    const info = await transporter.sendMail({
+      from: `"Luxury China Travels Website" <${user}>`,
+      to: user,
+      replyTo: enquiry.email,
+      subject: buildSubject(enquiry),
+      text: buildPlainText(enquiry),
+      html: buildHtml(enquiry),
+    });
+
+    logContactInfo("Contact enquiry email sent", {
+      messageId: info.messageId,
+      accepted: info.accepted,
+      rejected: info.rejected,
+      response: info.response,
+    });
+  } catch (error) {
+    logContactError("Nodemailer sendMail failed", error, {
+      customerEmail: enquiry.email,
+      customerName: enquiry.name,
+      smtpHost: "smtp.gmail.com",
+      smtpPort: 465,
+    });
+    throw error;
+  }
 }
