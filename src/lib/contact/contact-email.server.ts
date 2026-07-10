@@ -21,10 +21,10 @@ function getTransporter(): Transporter {
   const { user, appPassword } = getEmailConfig();
   const diagnostics = getEmailConfigDiagnostics();
 
-  logContactInfo("Creating SMTP transporter", diagnostics);
+  void logContactInfo("Creating SMTP transporter", diagnostics);
 
   if (!user || !appPassword) {
-    logContactError("Email configuration missing", new Error("Email is not configured"), diagnostics);
+    void logContactError("Email configuration missing", new Error("Email is not configured"), diagnostics);
     throw new Error("Email is not configured. Set EMAIL_USER and EMAIL_APP_PASSWORD.");
   }
 
@@ -158,7 +158,7 @@ function escapeHtml(value: string): string {
 export async function sendContactEnquiryEmail(enquiry: ContactEnquiry): Promise<void> {
   const { user } = getEmailConfig();
 
-  logContactInfo("Sending contact enquiry email", {
+  await logContactInfo("Sending contact enquiry email", {
     debugId: enquiry.debugId,
     customerEmail: enquiry.email,
     customerName: enquiry.name,
@@ -178,14 +178,14 @@ export async function sendContactEnquiryEmail(enquiry: ContactEnquiry): Promise<
       html: buildHtml(enquiry),
     });
 
-    logContactInfo("Contact enquiry email sent", {
+    await logContactInfo("Contact enquiry email sent", {
       messageId: info.messageId,
       accepted: info.accepted,
       rejected: info.rejected,
       response: info.response,
     });
   } catch (error) {
-    logContactError("Nodemailer sendMail failed", error, {
+    await logContactError("Nodemailer sendMail failed", error, {
       debugId: enquiry.debugId,
       customerEmail: enquiry.email,
       customerName: enquiry.name,
