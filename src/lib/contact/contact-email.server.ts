@@ -5,6 +5,7 @@ import { getEmailConfig } from "../config.server";
 import { getEmailConfigDiagnostics, logContactError, logContactInfo } from "./contact-log.server";
 
 export type ContactEnquiry = {
+  debugId?: string;
   name: string;
   email: string;
   phone?: string;
@@ -158,6 +159,7 @@ export async function sendContactEnquiryEmail(enquiry: ContactEnquiry): Promise<
   const { user } = getEmailConfig();
 
   logContactInfo("Sending contact enquiry email", {
+    debugId: enquiry.debugId,
     customerEmail: enquiry.email,
     customerName: enquiry.name,
     destinations: enquiry.destinations ?? null,
@@ -184,6 +186,7 @@ export async function sendContactEnquiryEmail(enquiry: ContactEnquiry): Promise<
     });
   } catch (error) {
     logContactError("Nodemailer sendMail failed", error, {
+      debugId: enquiry.debugId,
       customerEmail: enquiry.email,
       customerName: enquiry.name,
       smtpHost: "smtp.gmail.com",
