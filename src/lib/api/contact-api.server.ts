@@ -51,12 +51,16 @@ function formatError(error: unknown) {
 function getEmailConfigDiagnostics() {
   const user = process.env.EMAIL_USER;
   const appPassword = process.env.EMAIL_APP_PASSWORD;
+  const emailRelatedEnvKeys = Object.keys(process.env)
+    .filter((key) => key.toLowerCase().includes("email") || key.toLowerCase().includes("mail"))
+    .sort();
 
   return {
     hasEmailUser: Boolean(user),
     hasAppPassword: Boolean(appPassword),
     emailUser: user ?? null,
     appPasswordLength: appPassword?.length ?? 0,
+    emailRelatedEnvKeys,
     nodeEnv: process.env.NODE_ENV ?? "unknown",
     nodeVersion: process.version,
     cwd: process.cwd(),
@@ -100,6 +104,21 @@ export async function handleContactApi(request: Request) {
           },
         },
         { status: 400 },
+      );
+    }
+
+    if (!emailConfig.hasEmailUser || !emailConfig.hasAppPassword) {
+      return json(
+        {
+          success: false,
+          message: `Email environment variables are missing. Please set EMAIL_USER and EMAIL_APP_PASSWORD in cPanel. Ref: ${debugId}`,
+          debug: {
+            debugId,
+            stage: "api-email-config-missing",
+            emailConfig,
+          },
+        },
+        { status: 500 },
       );
     }
 
