@@ -1,4 +1,3 @@
-import nodemailer from "nodemailer";
 import type { Transporter } from "nodemailer";
 
 import { getEmailConfig } from "../config.server";
@@ -17,16 +16,18 @@ export type ContactEnquiry = {
   message?: string;
 };
 
-function getTransporter(): Transporter {
+async function getTransporter(): Promise<Transporter> {
   const { user, appPassword } = getEmailConfig();
   const diagnostics = getEmailConfigDiagnostics();
 
-  void logContactInfo("Creating SMTP transporter", diagnostics);
+  logContactInfo("Creating SMTP transporter", diagnostics);
 
   if (!user || !appPassword) {
-    void logContactError("Email configuration missing", new Error("Email is not configured"), diagnostics);
+    logContactError("Email configuration missing", new Error("Email is not configured"), diagnostics);
     throw new Error("Email is not configured. Set EMAIL_USER and EMAIL_APP_PASSWORD.");
   }
+
+  const nodemailer = (await import("nodemailer")).default;
 
   return nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -158,7 +159,7 @@ function escapeHtml(value: string): string {
 export async function sendContactEnquiryEmail(enquiry: ContactEnquiry): Promise<void> {
   const { user } = getEmailConfig();
 
-  await logContactInfo("Sending contact enquiry email", {
+  logContactInfo("Sending contact enquiry email", {
     debugId: enquiry.debugId,
     customerEmail: enquiry.email,
     customerName: enquiry.name,
@@ -166,9 +167,8 @@ export async function sendContactEnquiryEmail(enquiry: ContactEnquiry): Promise<
     emailConfig: getEmailConfigDiagnostics(),
   });
 
-  const transporter = getTransporter();
-
   try {
+    const transporter = await getTransporter();
     const info = await transporter.sendMail({
       from: `"Luxury China Travels Website" <${user}>`,
       to: user,
@@ -178,14 +178,14 @@ export async function sendContactEnquiryEmail(enquiry: ContactEnquiry): Promise<
       html: buildHtml(enquiry),
     });
 
-    await logContactInfo("Contact enquiry email sent", {
+    logContactInfo("Contact enquiry email sent", {
       messageId: info.messageId,
       accepted: info.accepted,
       rejected: info.rejected,
       response: info.response,
     });
   } catch (error) {
-    await logContactError("Nodemailer sendMail failed", error, {
+    logContactError("Nodemailer sendMail failed", error, {
       debugId: enquiry.debugId,
       customerEmail: enquiry.email,
       customerName: enquiry.name,
