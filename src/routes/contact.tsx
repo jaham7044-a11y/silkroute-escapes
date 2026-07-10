@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SectionLabel } from "@/components/SectionLabel";
 import { ROUTES } from "@/data/routes";
-import { submitContactEnquiry } from "@/lib/api/contact.functions";
 import { Check, Loader2, Mail, MapPin, Phone, Send } from "lucide-react";
 
 const CONTACT_DEBUG_VERSION = "contact-debug-ui-v3-2026-07-10";
@@ -72,8 +71,12 @@ function ContactPage() {
         },
       });
 
-      const result = await submitContactEnquiry({
-        data: {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
           name,
           email,
           phone: String(fd.get("phone") ?? "").trim() || undefined,
@@ -83,14 +86,38 @@ function ContactPage() {
           destinations: destinations || undefined,
           budget: String(fd.get("budget") ?? "").trim() || undefined,
           message: String(fd.get("message") ?? "").trim() || undefined,
-        },
+        }),
       });
 
+      const responseText = await response.text();
+      let result: {
+        success?: boolean;
+        message?: string;
+        debug?: unknown;
+      };
+
+      try {
+        result = JSON.parse(responseText) as typeof result;
+      } catch {
+        result = {
+          success: false,
+          message: `Non-JSON response from /api/contact (${response.status})`,
+          debug: {
+            version: CONTACT_DEBUG_VERSION,
+            stage: "client-non-json-api-response",
+            status: response.status,
+            statusText: response.statusText,
+            responseText,
+          },
+        };
+      }
+
       if (!result.success) {
-        setSubmitError(`DEBUG ${CONTACT_DEBUG_VERSION}: ${result.message}`);
+        setSubmitError(`DEBUG ${CONTACT_DEBUG_VERSION}: ${result.message ?? "Contact API failed"}`);
         setDebugInfo({
           version: CONTACT_DEBUG_VERSION,
           stage: "client-server-returned-failure",
+          apiStatus: response.status,
           serverResult: result,
         });
         return;
