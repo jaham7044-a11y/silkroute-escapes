@@ -1,6 +1,3 @@
-import { initializeApp, getApp, getApps } from "firebase/app";
-import { doc, getFirestore, serverTimestamp, setDoc } from "firebase/firestore";
-
 type LogMeta = Record<string, unknown>;
 
 const CONTACT_LOG_COLLECTION = "contactFormLogs";
@@ -13,12 +10,6 @@ const firebaseConfig = {
   messagingSenderId: "1095815576775",
   appId: "1:1095815576775:web:18ddf1d79cf59cb0a712e2",
 };
-
-const firebaseApp = getApps().some((app) => app.name === "contact-form-logs")
-  ? getApp("contact-form-logs")
-  : initializeApp(firebaseConfig, "contact-form-logs");
-
-const db = getFirestore(firebaseApp);
 
 export function formatError(error: unknown) {
   if (error instanceof Error) {
@@ -48,7 +39,6 @@ async function writeLog(level: "INFO" | "ERROR", message: string, meta?: LogMeta
   const debugId = typeof meta?.debugId === "string" ? meta.debugId : createContactDebugId();
   const entry = {
     time: new Date().toISOString(),
-    createdAt: serverTimestamp(),
     level,
     message,
     debugId,
@@ -59,7 +49,18 @@ async function writeLog(level: "INFO" | "ERROR", message: string, meta?: LogMeta
   };
 
   try {
-    await setDoc(doc(db, CONTACT_LOG_COLLECTION, `${debugId}-${Date.now()}`), entry);
+    const [{ initializeApp, getApp, getApps }, { doc, getFirestore, serverTimestamp, setDoc }] =
+      await Promise.all([import("firebase/app"), import("firebase/firestore")]);
+
+    const firebaseApp = getApps().some((app) => app.name === "contact-form-logs")
+      ? getApp("contact-form-logs")
+      : initializeApp(firebaseConfig, "contact-form-logs");
+
+    const db = getFirestore(firebaseApp);
+    await setDoc(doc(db, CONTACT_LOG_COLLECTION, `${debugId}-${Date.now()}`), {
+      ...entry,
+      createdAt: serverTimestamp(),
+    });
     return { ok: true };
   } catch (writeError) {
     console.error("[contact-form] Failed to write Firebase contact log:", writeError);
