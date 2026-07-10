@@ -21,7 +21,7 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const debugId = createContactDebugId();
 
-    logContactInfo("Contact enquiry submission received", {
+    await logContactInfo("Contact enquiry submission received", {
       debugId,
       customerEmail: data.email,
       customerName: data.name,
@@ -44,7 +44,7 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
         message: data.message,
       });
 
-      logContactInfo("Contact enquiry submission succeeded", {
+      await logContactInfo("Contact enquiry submission succeeded", {
         debugId,
         customerEmail: data.email,
         customerName: data.name,
@@ -55,7 +55,7 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
         message: "Your message has been sent successfully.",
       };
     } catch (error) {
-      logContactError("Contact enquiry submission failed", error, {
+      await logContactError("Contact enquiry submission failed", error, {
         debugId,
         customerEmail: data.email,
         customerName: data.name,

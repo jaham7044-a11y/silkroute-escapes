@@ -1,23 +1,24 @@
-import { appendFileSync, mkdirSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { initializeApp, getApp, getApps } from "firebase/app";
+import { doc, getFirestore, serverTimestamp, setDoc } from "firebase/firestore";
 
 type LogMeta = Record<string, unknown>;
 
-const LOG_FILE_NAME = "contact-form-debug.log";
+const CONTACT_LOG_COLLECTION = "contactFormLogs";
 
-function uniqueLogPaths() {
-  const paths = [
-    process.env.CONTACT_FORM_LOG_FILE,
-    join(process.cwd(), LOG_FILE_NAME),
-    join(process.cwd(), "logs", LOG_FILE_NAME),
-    process.env.HOME ? join(process.env.HOME, LOG_FILE_NAME) : undefined,
-    process.env.HOME ? join(process.env.HOME, "logs", LOG_FILE_NAME) : undefined,
-    join(tmpdir(), LOG_FILE_NAME),
-  ].filter((path): path is string => Boolean(path));
+const firebaseConfig = {
+  apiKey: "AIzaSyBh8-UbeSxbah4M8EQxb9zNaPsc8AtlSWk",
+  authDomain: "silkroute-4a557.firebaseapp.com",
+  projectId: "silkroute-4a557",
+  storageBucket: "silkroute-4a557.firebasestorage.app",
+  messagingSenderId: "1095815576775",
+  appId: "1:1095815576775:web:18ddf1d79cf59cb0a712e2",
+};
 
-  return [...new Set(paths)];
-}
+const firebaseApp = getApps().some((app) => app.name === "contact-form-logs")
+  ? getApp("contact-form-logs")
+  : initializeApp(firebaseConfig, "contact-form-logs");
+
+const db = getFirestore(firebaseApp);
 
 function formatError(error: unknown) {
   if (error instanceof Error) {
@@ -43,34 +44,28 @@ export function createContactDebugId() {
   return `contact-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function writeLog(level: "INFO" | "ERROR", message: string, meta?: LogMeta) {
+async function writeLog(level: "INFO" | "ERROR", message: string, meta?: LogMeta) {
+  const debugId = typeof meta?.debugId === "string" ? meta.debugId : createContactDebugId();
   const entry = {
     time: new Date().toISOString(),
+    createdAt: serverTimestamp(),
     level,
     message,
+    debugId,
     pid: process.pid,
     cwd: process.cwd(),
+    source: "contact-form",
     ...meta,
   };
 
-  const line = `${JSON.stringify(entry)}\n`;
-  const failures: string[] = [];
-
-  for (const logFile of uniqueLogPaths()) {
-    try {
-      mkdirSync(dirname(logFile), { recursive: true });
-      appendFileSync(logFile, line, "utf8");
-      return logFile;
-    } catch (writeError) {
-      const message =
-        writeError instanceof Error ? `${writeError.name}: ${writeError.message}` : String(writeError);
-      failures.push(`${logFile} (${message})`);
-    }
+  try {
+    await setDoc(doc(db, CONTACT_LOG_COLLECTION, `${debugId}-${Date.now()}`), entry);
+    return { ok: true };
+  } catch (writeError) {
+    console.error("[contact-form] Failed to write Firebase contact log:", writeError);
+    console.error("[contact-form]", JSON.stringify({ ...entry, createdAt: undefined }));
+    return { ok: false, error: formatError(writeError) };
   }
-
-  console.error("[contact-form] Failed to write contact log file:", failures.join("; "));
-  console.error("[contact-form]", line.trim());
-  return null;
 }
 
 export function getEmailConfigDiagnostics() {
@@ -83,18 +78,19 @@ export function getEmailConfigDiagnostics() {
     emailUser: user ?? null,
     appPasswordLength: appPassword?.length ?? 0,
     nodeEnv: process.env.NODE_ENV ?? "unknown",
-    attemptedLogFiles: uniqueLogPaths(),
+    firebaseProjectId: firebaseConfig.projectId,
+    firebaseCollection: CONTACT_LOG_COLLECTION,
     cwd: process.cwd(),
     home: process.env.HOME ?? null,
   };
 }
 
-export function logContactInfo(message: string, meta?: LogMeta) {
-  writeLog("INFO", message, meta);
+export async function logContactInfo(message: string, meta?: LogMeta) {
+  return writeLog("INFO", message, meta);
 }
 
-export function logContactError(message: string, error: unknown, meta?: LogMeta) {
-  writeLog("ERROR", message, {
+export async function logContactError(message: string, error: unknown, meta?: LogMeta) {
+  return writeLog("ERROR", message, {
     ...meta,
     error: formatError(error),
     emailConfig: getEmailConfigDiagnostics(),
