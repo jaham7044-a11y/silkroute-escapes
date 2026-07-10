@@ -1,7 +1,11 @@
+import { createRequire } from "node:module";
+
 import type { Transporter } from "nodemailer";
 
 import { getEmailConfig } from "../config.server";
 import { getEmailConfigDiagnostics, logContactError, logContactInfo } from "./contact-log.server";
+
+const require = createRequire(import.meta.url);
 
 export type ContactEnquiry = {
   debugId?: string;
@@ -27,7 +31,7 @@ async function getTransporter(): Promise<Transporter> {
     throw new Error("Email is not configured. Set EMAIL_USER and EMAIL_APP_PASSWORD.");
   }
 
-  const nodemailer = (await import("nodemailer")).default;
+  const nodemailer = require("nodemailer") as typeof import("nodemailer");
 
   return nodemailer.createTransport({
     host: "smtp.gmail.com",
