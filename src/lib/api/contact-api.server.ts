@@ -48,6 +48,14 @@ function formatError(error: unknown) {
   return { message: String(error) };
 }
 
+function isCpanelSocketImportError(error: unknown) {
+  return (
+    error instanceof Error &&
+    error.message === "open EEXIST" &&
+    (error as Error & { code?: unknown }).code === "EEXIST"
+  );
+}
+
 function getEmailConfigDiagnostics() {
   const user = process.env.EMAIL_USER;
   const appPassword = process.env.EMAIL_APP_PASSWORD;
@@ -122,9 +130,7 @@ export async function handleContactApi(request: Request) {
       );
     }
 
-    const { sendContactEnquiryEmail } = await import("../contact/contact-email.server");
-
-    await sendContactEnquiryEmail({
+    const enquiry = {
       debugId,
       name,
       email,
@@ -135,7 +141,19 @@ export async function handleContactApi(request: Request) {
       destinations: asOptionalString(payload.destinations),
       budget: asOptionalString(payload.budget),
       message: asOptionalString(payload.message),
-    });
+    };
+
+    try {
+      const { sendContactEnquiryEmail } = await import("../contact/contact-email.server");
+      await sendContactEnquiryEmail(enquiry);
+    } catch (error) {
+      if (!isCpanelSocketImportError(error)) {
+        throw error;
+      }
+
+      const { sendContactEnquiryWithSendmail } = await import("../contact/contact-sendmail.server");
+      await sendContactEnquiryWithSendmail(enquiry);
+    }
 
     return json({
       success: true,
