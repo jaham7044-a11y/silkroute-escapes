@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { sendContactEnquiryEmail } from "../contact/contact-email.server";
+import { logContactError, logContactInfo } from "../contact/contact-log.server";
 
 const contactInputSchema = z.object({
   name: z.string().trim().min(1, "Name is required."),
@@ -18,6 +19,14 @@ const contactInputSchema = z.object({
 export const submitContactEnquiry = createServerFn({ method: "POST" })
   .validator(contactInputSchema)
   .handler(async ({ data }) => {
+    logContactInfo("Contact enquiry submission received", {
+      customerEmail: data.email,
+      customerName: data.name,
+      hasPhone: Boolean(data.phone),
+      hasMessage: Boolean(data.message),
+      destinations: data.destinations ?? null,
+    });
+
     try {
       await sendContactEnquiryEmail({
         name: data.name,
@@ -31,12 +40,20 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
         message: data.message,
       });
 
+      logContactInfo("Contact enquiry submission succeeded", {
+        customerEmail: data.email,
+        customerName: data.name,
+      });
+
       return {
         success: true as const,
         message: "Your message has been sent successfully.",
       };
     } catch (error) {
-      console.error("Contact form email error:", error);
+      logContactError("Contact enquiry submission failed", error, {
+        customerEmail: data.email,
+        customerName: data.name,
+      });
 
       const isConfigError =
         error instanceof Error && error.message.includes("Email is not configured");
