@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { sendContactEnquiryEmail } from "../contact/contact-email.server";
-import { logContactError, logContactInfo } from "../contact/contact-log.server";
+import { createContactDebugId, logContactError, logContactInfo } from "../contact/contact-log.server";
 
 const contactInputSchema = z.object({
   name: z.string().trim().min(1, "Name is required."),
@@ -19,7 +19,10 @@ const contactInputSchema = z.object({
 export const submitContactEnquiry = createServerFn({ method: "POST" })
   .validator(contactInputSchema)
   .handler(async ({ data }) => {
+    const debugId = createContactDebugId();
+
     logContactInfo("Contact enquiry submission received", {
+      debugId,
       customerEmail: data.email,
       customerName: data.name,
       hasPhone: Boolean(data.phone),
@@ -29,6 +32,7 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
 
     try {
       await sendContactEnquiryEmail({
+        debugId,
         name: data.name,
         email: data.email,
         phone: data.phone,
@@ -41,6 +45,7 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
       });
 
       logContactInfo("Contact enquiry submission succeeded", {
+        debugId,
         customerEmail: data.email,
         customerName: data.name,
       });
@@ -51,6 +56,7 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
       };
     } catch (error) {
       logContactError("Contact enquiry submission failed", error, {
+        debugId,
         customerEmail: data.email,
         customerName: data.name,
       });
@@ -61,8 +67,8 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
       return {
         success: false as const,
         message: isConfigError
-          ? "Contact form is temporarily unavailable. Please email us directly."
-          : "Unable to send your message. Please try again.",
+          ? `Contact form is temporarily unavailable. Please email us directly. Ref: ${debugId}`
+          : `Unable to send your message. Please try again. Ref: ${debugId}`,
       };
     }
   });
