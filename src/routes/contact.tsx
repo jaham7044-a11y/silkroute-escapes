@@ -5,6 +5,8 @@ import { ROUTES } from "@/data/routes";
 import { submitContactEnquiry } from "@/lib/api/contact.functions";
 import { Check, Loader2, Mail, MapPin, Phone, Send } from "lucide-react";
 
+const CONTACT_DEBUG_VERSION = "contact-debug-ui-v3-2026-07-10";
+
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
@@ -44,7 +46,6 @@ function ContactPage() {
     if (Object.keys(errs).length) return;
 
     setSubmitError(null);
-    setDebugInfo(null);
     setIsSubmitting(true);
 
     try {
@@ -55,6 +56,22 @@ function ContactPage() {
         .join(" · ");
 
       const travelersRaw = String(fd.get("travelers") ?? "").trim();
+      setDebugInfo({
+        version: CONTACT_DEBUG_VERSION,
+        stage: "client-before-server-call",
+        submittedAt: new Date().toISOString(),
+        payload: {
+          hasName: Boolean(name),
+          email,
+          hasPhone: Boolean(String(fd.get("phone") ?? "").trim()),
+          hasCountry: Boolean(String(fd.get("country") ?? "").trim()),
+          hasDates: Boolean(String(fd.get("dates") ?? "").trim()),
+          travelers: travelersRaw || null,
+          destinations: destinations || null,
+          hasMessage: Boolean(String(fd.get("message") ?? "").trim()),
+        },
+      });
+
       const result = await submitContactEnquiry({
         data: {
           name,
@@ -70,15 +87,20 @@ function ContactPage() {
       });
 
       if (!result.success) {
-        setSubmitError(result.message);
-        setDebugInfo("debug" in result ? result.debug : { note: "No debug payload returned from server." });
+        setSubmitError(`DEBUG ${CONTACT_DEBUG_VERSION}: ${result.message}`);
+        setDebugInfo({
+          version: CONTACT_DEBUG_VERSION,
+          stage: "client-server-returned-failure",
+          serverResult: result,
+        });
         return;
       }
 
       setSent(true);
     } catch (error) {
-      setSubmitError("Unable to send your message. Please try again.");
+      setSubmitError(`DEBUG ${CONTACT_DEBUG_VERSION}: Unable to send your message. Please try again.`);
       setDebugInfo({
+        version: CONTACT_DEBUG_VERSION,
         stage: "client-catch",
         note: "Request failed before a normal server response was received.",
         error:
@@ -164,6 +186,10 @@ function ContactPage() {
                   className="mt-2 w-full bg-transparent border-b border-gold/30 text-ivory py-3 focus:outline-none focus:border-gold resize-none disabled:opacity-60"
                   placeholder="Anything you'd love to experience…"
                 />
+              </div>
+
+              <div className="rounded-xl border border-gold/30 bg-gold/5 px-4 py-3 text-xs text-gold/80">
+                Temporary contact debug build active: <span className="font-mono">{CONTACT_DEBUG_VERSION}</span>
               </div>
 
               {submitError && (
