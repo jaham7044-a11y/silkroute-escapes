@@ -28,7 +28,7 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
     const debugId = createContactDebugId();
     const emailConfig = getEmailConfigDiagnostics();
 
-    const firebaseLog = await logContactInfo("Contact enquiry submission received", {
+    const firstLog = logContactInfo("Contact enquiry submission received", {
       debugId,
       customerEmail: data.email,
       customerName: data.name,
@@ -52,7 +52,7 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
         message: data.message,
       });
 
-      await logContactInfo("Contact enquiry submission succeeded", {
+      logContactInfo("Contact enquiry submission succeeded", {
         debugId,
         customerEmail: data.email,
         customerName: data.name,
@@ -63,7 +63,7 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
         message: "Your message has been sent successfully.",
       };
     } catch (error) {
-      await logContactError("Contact enquiry submission failed", error, {
+      logContactError("Contact enquiry submission failed", error, {
         debugId,
         customerEmail: data.email,
         customerName: data.name,
@@ -82,7 +82,7 @@ export const submitContactEnquiry = createServerFn({ method: "POST" })
           debugId,
           stage: "server-handler",
           emailConfig,
-          firebaseLog,
+          firstLog,
           error: formatError(error),
         },
       };

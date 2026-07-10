@@ -1,16 +1,5 @@
 type LogMeta = Record<string, unknown>;
 
-const CONTACT_LOG_COLLECTION = "contactFormLogs";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBh8-UbeSxbah4M8EQxb9zNaPsc8AtlSWk",
-  authDomain: "silkroute-4a557.firebaseapp.com",
-  projectId: "silkroute-4a557",
-  storageBucket: "silkroute-4a557.firebasestorage.app",
-  messagingSenderId: "1095815576775",
-  appId: "1:1095815576775:web:18ddf1d79cf59cb0a712e2",
-};
-
 export function formatError(error: unknown) {
   if (error instanceof Error) {
     const extra: LogMeta = {};
@@ -35,7 +24,7 @@ export function createContactDebugId() {
   return `contact-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-async function writeLog(level: "INFO" | "ERROR", message: string, meta?: LogMeta) {
+function writeLog(level: "INFO" | "ERROR", message: string, meta?: LogMeta) {
   const debugId = typeof meta?.debugId === "string" ? meta.debugId : createContactDebugId();
   const entry = {
     time: new Date().toISOString(),
@@ -48,25 +37,15 @@ async function writeLog(level: "INFO" | "ERROR", message: string, meta?: LogMeta
     ...meta,
   };
 
-  try {
-    const [{ initializeApp, getApp, getApps }, { doc, getFirestore, serverTimestamp, setDoc }] =
-      await Promise.all([import("firebase/app"), import("firebase/firestore")]);
+  const line = JSON.stringify(entry);
 
-    const firebaseApp = getApps().some((app) => app.name === "contact-form-logs")
-      ? getApp("contact-form-logs")
-      : initializeApp(firebaseConfig, "contact-form-logs");
-
-    const db = getFirestore(firebaseApp);
-    await setDoc(doc(db, CONTACT_LOG_COLLECTION, `${debugId}-${Date.now()}`), {
-      ...entry,
-      createdAt: serverTimestamp(),
-    });
-    return { ok: true };
-  } catch (writeError) {
-    console.error("[contact-form] Failed to write Firebase contact log:", writeError);
-    console.error("[contact-form]", JSON.stringify({ ...entry, createdAt: undefined }));
-    return { ok: false, error: formatError(writeError) };
+  if (level === "ERROR") {
+    console.error("[contact-form]", line);
+  } else {
+    console.info("[contact-form]", line);
   }
+
+  return { ok: true, target: "console" };
 }
 
 export function getEmailConfigDiagnostics() {
@@ -79,18 +58,17 @@ export function getEmailConfigDiagnostics() {
     emailUser: user ?? null,
     appPasswordLength: appPassword?.length ?? 0,
     nodeEnv: process.env.NODE_ENV ?? "unknown",
-    firebaseProjectId: firebaseConfig.projectId,
-    firebaseCollection: CONTACT_LOG_COLLECTION,
     cwd: process.cwd(),
     home: process.env.HOME ?? null,
+    nodeVersion: process.version,
   };
 }
 
-export async function logContactInfo(message: string, meta?: LogMeta) {
+export function logContactInfo(message: string, meta?: LogMeta) {
   return writeLog("INFO", message, meta);
 }
 
-export async function logContactError(message: string, error: unknown, meta?: LogMeta) {
+export function logContactError(message: string, error: unknown, meta?: LogMeta) {
   return writeLog("ERROR", message, {
     ...meta,
     error: formatError(error),
