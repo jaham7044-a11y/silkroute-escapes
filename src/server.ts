@@ -1,13 +1,5 @@
 import "./lib/error-capture";
 
-import { sendContactEnquiryEmail } from "./lib/contact/contact-email.server";
-import {
-  createContactDebugId,
-  formatError,
-  getEmailConfigDiagnostics,
-  logContactError,
-  logContactInfo,
-} from "./lib/contact/contact-log.server";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
@@ -43,6 +35,46 @@ function asOptionalString(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
 }
 
+function createContactDebugId() {
+  return `contact-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function formatError(error: unknown) {
+  if (error instanceof Error) {
+    const extra: Record<string, unknown> = {};
+
+    for (const key of ["code", "command", "response", "responseCode", "errno", "syscall"] as const) {
+      const value = (error as Error & Record<string, unknown>)[key];
+      if (value != null) extra[key] = value;
+    }
+
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      ...extra,
+    };
+  }
+
+  return { message: String(error) };
+}
+
+function getEmailConfigDiagnostics() {
+  const user = process.env.EMAIL_USER;
+  const appPassword = process.env.EMAIL_APP_PASSWORD;
+
+  return {
+    hasEmailUser: Boolean(user),
+    hasAppPassword: Boolean(appPassword),
+    emailUser: user ?? null,
+    appPasswordLength: appPassword?.length ?? 0,
+    nodeEnv: process.env.NODE_ENV ?? "unknown",
+    cwd: process.cwd(),
+    home: process.env.HOME ?? null,
+    nodeVersion: process.version,
+  };
+}
+
 async function handleContactApi(request: Request): Promise<Response> {
   const debugId = createContactDebugId();
   const emailConfig = getEmailConfigDiagnostics();
@@ -71,12 +103,15 @@ async function handleContactApi(request: Request): Promise<Response> {
       );
     }
 
-    logContactInfo("Contact API submission received", {
+    console.info("[contact-form]", JSON.stringify({
       debugId,
+      message: "Contact API submission received",
       customerEmail: email,
       customerName: name,
       emailConfig,
-    });
+    }));
+
+    const { sendContactEnquiryEmail } = await import("./lib/contact/contact-email.server");
 
     await sendContactEnquiryEmail({
       debugId,
@@ -91,18 +126,24 @@ async function handleContactApi(request: Request): Promise<Response> {
       message: asOptionalString(payload.message),
     });
 
-    logContactInfo("Contact API submission succeeded", {
+    console.info("[contact-form]", JSON.stringify({
       debugId,
+      message: "Contact API submission succeeded",
       customerEmail: email,
       customerName: name,
-    });
+    }));
 
     return json({
       success: true,
       message: "Your message has been sent successfully.",
     });
   } catch (error) {
-    logContactError("Contact API submission failed", error, { debugId });
+    console.error("[contact-form]", JSON.stringify({
+      debugId,
+      message: "Contact API submission failed",
+      error: formatError(error),
+      emailConfig,
+    }));
 
     const isConfigError =
       error instanceof Error && error.message.includes("Email is not configured");
