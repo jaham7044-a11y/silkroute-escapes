@@ -42,9 +42,9 @@ export default {
     try {
       const url = new URL(request.url);
 
-      if (url.pathname === "/api/contact") {
-        const { handleContactApi } = await import("./lib/api/contact-api.server");
-        return await handleContactApi(request);
+      if (url.pathname === "/api/contact-email") {
+        const { handleContactEmailApi } = await import("./lib/api/contact-email-api.server");
+        return await handleContactEmailApi(request);
       }
 
       const handler = await getServerEntry();

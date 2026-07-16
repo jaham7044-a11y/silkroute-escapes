@@ -3,8 +3,7 @@ import { useState } from "react";
 import { SectionLabel } from "@/components/SectionLabel";
 import { ROUTES } from "@/data/routes";
 import { Check, Loader2, Mail, MapPin, Phone, Send } from "lucide-react";
-
-const CONTACT_DEBUG_VERSION = "contact-debug-ui-v3-2026-07-10";
+import { contactEnquiriesService } from "@/lib/contact/contact-enquiries-service";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -45,6 +44,7 @@ function ContactPage() {
     if (Object.keys(errs).length) return;
 
     setSubmitError(null);
+    setDebugInfo(null);
     setIsSubmitting(true);
 
     try {
@@ -55,86 +55,54 @@ function ContactPage() {
         .join(" · ");
 
       const travelersRaw = String(fd.get("travelers") ?? "").trim();
-      setDebugInfo({
-        version: CONTACT_DEBUG_VERSION,
-        stage: "client-before-server-call",
-        submittedAt: new Date().toISOString(),
-        payload: {
-          hasName: Boolean(name),
-          email,
-          hasPhone: Boolean(String(fd.get("phone") ?? "").trim()),
-          hasCountry: Boolean(String(fd.get("country") ?? "").trim()),
-          hasDates: Boolean(String(fd.get("dates") ?? "").trim()),
-          travelers: travelersRaw || null,
-          destinations: destinations || null,
-          hasMessage: Boolean(String(fd.get("message") ?? "").trim()),
-        },
-      });
+      const enquiry = {
+        name,
+        email,
+        phone: String(fd.get("phone") ?? "").trim() || undefined,
+        country: String(fd.get("country") ?? "").trim() || undefined,
+        dates: String(fd.get("dates") ?? "").trim() || undefined,
+        travelers: travelersRaw ? Number(travelersRaw) : undefined,
+        destinations: destinations || undefined,
+        budget: String(fd.get("budget") ?? "").trim() || undefined,
+        message: String(fd.get("message") ?? "").trim() || undefined,
+      };
 
-      const response = await fetch("/api/contact", {
+      const enquiryId = await contactEnquiriesService.create(enquiry);
+      const emailResponse = await fetch("/api/contact-email", {
         method: "POST",
         headers: {
           "content-type": "application/json",
         },
         body: JSON.stringify({
-          name,
-          email,
-          phone: String(fd.get("phone") ?? "").trim() || undefined,
-          country: String(fd.get("country") ?? "").trim() || undefined,
-          dates: String(fd.get("dates") ?? "").trim() || undefined,
-          travelers: travelersRaw ? Number(travelersRaw) : undefined,
-          destinations: destinations || undefined,
-          budget: String(fd.get("budget") ?? "").trim() || undefined,
-          message: String(fd.get("message") ?? "").trim() || undefined,
+          enquiryId,
+          ...enquiry,
         }),
       });
 
-      const responseText = await response.text();
-      let result: {
-        success?: boolean;
-        message?: string;
-        debug?: unknown;
-      };
+      const emailResult = await emailResponse.json().catch(() => ({
+        success: false,
+        message: `Non-JSON response from /api/contact-email (${emailResponse.status})`,
+      }));
 
-      try {
-        result = JSON.parse(responseText) as typeof result;
-      } catch {
-        result = {
-          success: false,
-          message: `Non-JSON response from /api/contact (${response.status})`,
-          debug: {
-            version: CONTACT_DEBUG_VERSION,
-            stage: "client-non-json-api-response",
-            status: response.status,
-            statusText: response.statusText,
-            responseText,
-          },
-        };
-      }
-
-      if (!result.success) {
-        setSubmitError(`DEBUG ${CONTACT_DEBUG_VERSION}: ${result.message ?? "Contact API failed"}`);
+      if (!emailResult.success) {
+        setSubmitError("Your request was saved, but the email notification failed. Please contact us directly.");
         setDebugInfo({
-          version: CONTACT_DEBUG_VERSION,
-          stage: "client-server-returned-failure",
-          apiStatus: response.status,
-          serverResult: result,
+          enquiryId,
+          apiStatus: emailResponse.status,
+          serverResult: emailResult,
         });
         return;
       }
 
       setSent(true);
     } catch (error) {
-      setSubmitError(`DEBUG ${CONTACT_DEBUG_VERSION}: Unable to send your message. Please try again.`);
-      setDebugInfo({
-        version: CONTACT_DEBUG_VERSION,
-        stage: "client-catch",
-        note: "Request failed before a normal server response was received.",
-        error:
-          error instanceof Error
-            ? { name: error.name, message: error.message, stack: error.stack }
-            : { message: String(error) },
-      });
+      console.error(error);
+      setSubmitError("Unable to submit your request. Please try again or contact us directly.");
+      setDebugInfo(
+        error instanceof Error
+          ? { name: error.name, message: error.message, stack: error.stack }
+          : { message: String(error) },
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -213,10 +181,6 @@ function ContactPage() {
                   className="mt-2 w-full bg-transparent border-b border-gold/30 text-ivory py-3 focus:outline-none focus:border-gold resize-none disabled:opacity-60"
                   placeholder="Anything you'd love to experience…"
                 />
-              </div>
-
-              <div className="rounded-xl border border-gold/30 bg-gold/5 px-4 py-3 text-xs text-gold/80">
-                Temporary contact debug build active: <span className="font-mono">{CONTACT_DEBUG_VERSION}</span>
               </div>
 
               {submitError && (
