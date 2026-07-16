@@ -1,7 +1,9 @@
-import process from "node:process";
-
 // Server-only config. The .server.ts suffix prevents Vite from bundling
 // this file into the client — values here never reach the browser.
+//
+// NOTE: do NOT `import process from "node:process"` here. Under cPanel's
+// Phusion Passenger, building the ESM facade for `node:process` evaluates the
+// `stdin` getter, which throws `open EEXIST`. Use the Node global `process`.
 //
 // On Cloudflare Workers, env binds at REQUEST time. Module-scope reads
 // (e.g. `const x = process.env.X`) resolve to undefined — always read
