@@ -43,8 +43,26 @@ export default {
       const url = new URL(request.url);
 
       if (url.pathname === "/api/contact-email") {
-        const { handleContactEmailApi } = await import("./lib/api/contact-email-api.server");
-        return await handleContactEmailApi(request);
+        try {
+          const { handleContactEmailApi } = await import("./lib/api/contact-email-api.server");
+          return await handleContactEmailApi(request);
+        } catch (error) {
+          console.error(error);
+          return new Response(
+            JSON.stringify({
+              success: false,
+              message: "Contact email endpoint failed to load.",
+              debug: {
+                stage: "server-module-load",
+                error:
+                  error instanceof Error
+                    ? { name: error.name, message: error.message, stack: error.stack }
+                    : { message: String(error) },
+              },
+            }),
+            { status: 500, headers: { "content-type": "application/json; charset=utf-8" } },
+          );
+        }
       }
 
       const handler = await getServerEntry();
